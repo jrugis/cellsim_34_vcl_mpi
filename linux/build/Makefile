@@ -2,12 +2,12 @@
 # NOTE: uncomment lines for the 3 or 4 variable model respectively
 #
 #EXE = generic3d_03
-EXE = generic3d_03_debug
+#EXE = generic3d_03_debug
 #CPP_DEFS =
 #
 #EXE = generic3d_04
-#EXE = generic3d_04_debug
-#CPP_DEFS = -D FOUR_VARIABLES
+EXE = generic3d_04_debug
+CPP_DEFS = -D FOUR_VARIABLES
 
 #NOTE: uncomment for debug or optimised respectively  
 #
