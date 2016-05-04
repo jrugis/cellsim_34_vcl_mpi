@@ -6,6 +6,8 @@ cs.msh
 *.bin
 *.pdf
 *.pyc
+*.out
+*.log
 generic3d*
 !test-ref/*.bin
 !test-ref/*.dat

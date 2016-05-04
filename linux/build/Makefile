@@ -4,21 +4,20 @@
 EXE = generic3d_03
 #EXE = generic3d_03_debug
 CPP_DEFS =
+#CPP_DEFS = -DVIENNACL_WITH_OPENMP -fopenmp
 #
 #EXE = generic3d_04
 #EXE = generic3d_04_debug
-#CPP_DEFS = -D FOUR_VARIABLES
+#CPP_DEFS = -DFOUR_VARIABLES
 
-#NOTE: uncomment for debug or optimised respectively  
+#NOTE: uncomment for debug, profile or optimised respectively  
 #
 #CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -Og -Wall -Wextra
+#CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -O3 -pg 
 CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -O3 
 
 CPP = g++
 CPP_INCLUDES = -I/usr/include/eigen3
-
-LINK = $(CPP)
-LINK_FLAGS = -m64
 
 OBJS = cell_3d.o cGeneric3dModel.o cCellMesh.o cVCLSolver.o
 SRC = ../../src
@@ -38,7 +37,7 @@ cVCLSolver.o: $(SRC)/cVCLSolver.cpp $(SRC)/cVCLSolver.h
 	$(CPP) $(CPP_FLAGS) -o $@ -c $<
 
 $(EXE): $(OBJS)
-	$(LINK) $(LINK_FLAGS) -o ../$@ $+
+	$(CPP) $(CPP_FLAGS) -o ../$@ $+
 
 clean:
 	rm *.o
