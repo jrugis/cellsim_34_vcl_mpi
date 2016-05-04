@@ -3,7 +3,7 @@
 #
 EXE = generic3d_03
 #EXE = generic3d_03_debug
-#CPP_DEFS =
+CPP_DEFS =
 #
 #EXE = generic3d_04
 #EXE = generic3d_04_debug
