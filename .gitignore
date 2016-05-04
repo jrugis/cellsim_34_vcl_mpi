@@ -8,4 +8,6 @@ cs.msh
 *.pyc
 generic3d*
 !test-ref/*.bin
+!test-ref/*.dat
+
 
