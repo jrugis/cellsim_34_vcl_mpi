@@ -1,8 +1,8 @@
 
 # NOTE: uncomment lines for the 3 or 4 variable model respectively
 #
-#EXE = generic3d_03
-EXE = generic3d_03_debug
+EXE = generic3d_03
+#EXE = generic3d_03_debug
 #CPP_DEFS =
 #
 #EXE = generic3d_04
@@ -11,8 +11,8 @@ EXE = generic3d_03_debug
 
 #NOTE: uncomment for debug or optimised respectively  
 #
-CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -Og -Wall -Wextra
-#CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -O3 
+#CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -Og -Wall -Wextra
+CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -O3 
 
 CPP = g++
 CPP_INCLUDES = -I/usr/include/eigen3
