@@ -7,5 +7,5 @@ cs.msh
 *.pdf
 *.pyc
 generic3d*
-!test_ref/*.bin
+!test-ref/*.bin
 
