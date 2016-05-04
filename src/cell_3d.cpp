@@ -10,7 +10,7 @@
 
 #define MESH_FILE "cs.msh"
 #include <iostream>
-#include <ctime>
+#include <sys/time.h>
 #include <unistd.h>
 
 #include "cCellMesh.h"
@@ -21,11 +21,11 @@
 int main(int argc,char **args){
 	cCellMesh *mesh_00;
 	cGeneric3dModel *model;
-	std::clock_t start;
-	double duration;
+	struct timeval start, end;
+	int duration;
 	std::string host_name;
 
-	start = std::clock(); // get the time
+	gettimeofday(&start, NULL); // get the time
 
 	// get the hostname
 	char temp[TEMP_SIZE];
@@ -46,7 +46,8 @@ int main(int argc,char **args){
 
 	// save the results
 	model->save_results();
-	duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+	gettimeofday(&end, NULL);
+	duration = end.tv_sec - start.tv_sec;
 	std::cout << "<MAIN> execution time: " << duration << " sec" << std::endl;
 
 	delete model;
