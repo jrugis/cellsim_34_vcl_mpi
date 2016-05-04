@@ -15,6 +15,8 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
+#include <valgrind/memcheck.h>
+
 #include "cCellMesh.h"
 
 cCellMesh::cCellMesh(std::string file_name){
@@ -71,7 +73,7 @@ void cCellMesh::get_mesh(std::string file_name){
 		break;
 	}
 	surface_node.resize(nodes_count, Eigen::NoChange);
-	surface_node.Constant(nodes_count, false);
+	surface_node.setZero();
 
 	// get the mesh elements
 	std::cout << "<MESH> getting the mesh elements..." << std::endl;
