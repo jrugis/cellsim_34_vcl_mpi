@@ -1,0 +1,11 @@
+.DS_Store
+cs.dat
+cs.msh
+
+*.o
+*.bin
+*.pdf
+*.pyc
+generic3d*
+!test_ref/*.bin
+
