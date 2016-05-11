@@ -11,5 +11,7 @@ cs.msh
 generic3d*
 !test-ref/*.bin
 !test-ref/*.dat
-
-
+!pan/test/generic3d_03-cR.bin
+!pan/test/generic3d_04-cR.bin
+__pycache__/
+*.dSYM/
