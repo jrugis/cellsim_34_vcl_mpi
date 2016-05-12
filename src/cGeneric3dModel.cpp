@@ -15,7 +15,11 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
-#include "cVCLSolver.h"
+#ifdef MKL_SOLVER
+    #include "cMKLSolver.h"
+#else
+    #include "cVCLSolver.h"
+#endif
 #include "cGeneric3dModel.h"
 
 cGeneric3dModel::cGeneric3dModel(cCellMesh *m) {
@@ -25,7 +29,11 @@ cGeneric3dModel::cGeneric3dModel(cCellMesh *m) {
 	make_matrices();  // create the constant matrices
 	init_u();
 	std::cout << "<MODEL> creating solver object..." << std::endl;
-	solver = new cVCLSolver(Amat);
+    #ifdef MKL_SOLVER
+        solver = new cMKLSolver(Amat);
+    #else
+        solver = new cVCLSolver(Amat);
+    #endif
 }
 
 cGeneric3dModel::~cGeneric3dModel() {

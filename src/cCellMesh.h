@@ -11,7 +11,11 @@
 #include <string>
 #include <Eigen/Dense>
 
-#include "cVCLSolver.h"
+#ifdef MKL_SOLVER
+    #include "cMKLSolver.h"
+#else
+    #include "cVCLSolver.h"
+#endif
 
 typedef double tCoord;
 typedef long tElement;

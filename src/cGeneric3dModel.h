@@ -11,7 +11,11 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 #include "cCellMesh.h"
-#include "cVCLSolver.h"
+#ifdef MKL_SOLVER
+    #include "cMKLSolver.h"
+#else
+    #include "cVCLSolver.h"
+#endif
 
 #ifndef FOUR_VARIABLES
 #define VARIABLES 3 // the number of model variables
@@ -49,7 +53,7 @@ enum model_node_values{IPR_n, PLC_n, MODELNCOUNT};            // node spatial fa
 enum model_element_values{VOL_e, IPR_e, PLC_e, MODELECOUNT};  // element volume and spatial factors
 
 // some convenience typedefs
-typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, Eigen::Dynamic> MatrixXXC;
+typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, Eigen::Dynamic> MatrixXXC; // leave as column major otherwise will break MKL solver
 typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, 1> MatrixX1C;
 typedef Eigen::Array<tCalcs, Eigen::Dynamic, 1> ArrayX1C;
 typedef Eigen::Array<tCalcs, 1, VARIABLES> Array1VC;
@@ -82,7 +86,11 @@ private:
 	void fatal_error(std::string msg);
 
 	cCellMesh *mesh;
-	cVCLSolver *solver;
+    #ifdef MKL_SOLVER
+        cMKLSolver *solver;
+    #else
+        cVCLSolver *solver;
+    #endif
 	tCalcs p[PCOUNT]; // the model parameters array
 	long numt, plc_st, plc_ft; // number of time steps, PLC start and finish time steps
 	Eigen::Array<tCalcs, Eigen::Dynamic, MODELNCOUNT> node_data;
