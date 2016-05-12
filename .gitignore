@@ -17,3 +17,4 @@ generic3d*
 !pan/test/generic3d_04_cuda-cR.bin
 __pycache__/
 *.dSYM/
+job_*.h5

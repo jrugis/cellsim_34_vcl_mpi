@@ -8,11 +8,13 @@
 #
 EXE = generic3d_03
 #EXE = generic3d_03_cuda
+#EXE = generic3d_03_mkl
 #EXE = generic3d_03_debug
 CPP_DEFS =
 #
 #EXE = generic3d_04
 #EXE = generic3d_04_cuda
+#EXE = generic3d_04_mkl
 #EXE = generic3d_04_debug
 #CPP_DEFS = -DFOUR_VARIABLES
 
@@ -29,14 +31,19 @@ LDFLAGS =
 #LDFLAGS = 
 
 # NOTE: uncomment lines for the OpenMP version (must be used with CPU version above only)
+#
 #CXXFLAGS += -openmp -DVIENNACL_WITH_OPENMP
 #LDFLAGS += -openmp
+
+# NOTE: uncomment for the MKL solver (must be used with CPU version above only)
+#
+#CXXFLAGS += -I${MKLROOT}/include -DMKL_SOLVER
+#LDFLAGS += -L${MKLROOT}/lib -lmkl_rt -lpthread -lm -ldl
 
 # library include paths
 EIGEN_INC = -I/share/easybuild/RHEL6.3/sandybridge/software/Eigen/3.2.4-ictce-5.4.0/include
 BOOST_INC = -I/share/easybuild/RHEL6.3/sandybridge/software/Boost/1.55.0-goolf-1.5.14-Python-2.7.8/include
 VCL_INC = -I/projects/nesi00119/code/CS_dev/viennacl/ViennaCL-1.7.1
-# uncomment to disable debugging for release version
 DEFS = -DNDEBUG
 
 # nothing should need to change below here
@@ -45,7 +52,7 @@ DEFS = -DNDEBUG
 CXXFLAGS += $(CPP_DEFS) $(DEFS) $(EIGEN_INC) $(BOOST_INC) $(VCL_INC)
 
 SRC = ../../src
-OBJS = cell_3d.o cGeneric3dModel.o cCellMesh.o cVCLSolver.o
+OBJS = cell_3d.o cGeneric3dModel.o cCellMesh.o cVCLSolver.o cMKLSolver.o
 EXEDIR = ..
 
 all: $(EXEDIR)/$(EXE)
@@ -60,6 +67,9 @@ cCellMesh.o: $(SRC)/cCellMesh.$(SUFFIX) $(SRC)/cCellMesh.h
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 cVCLSolver.o: $(SRC)/cVCLSolver.$(SUFFIX) $(SRC)/cVCLSolver.h
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+cMKLSolver.o: $(SRC)/cMKLSolver.$(SUFFIX) $(SRC)/cMKLSolver.h
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 $(EXEDIR)/$(EXE): $(OBJS)
