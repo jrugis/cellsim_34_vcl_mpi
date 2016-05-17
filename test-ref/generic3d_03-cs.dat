@@ -12,7 +12,11 @@
 %===================================================================
 % simulation time step(s), total simulation time(s)
 %! delT totalT
-0.05 100
+0.05 120
+%----------------------------------------------------
+% PLC start time(s), PLC finish time(s)
+%! PLCsrt PLCfin
+0 100
 %----------------------------------------------------
 % near/far distance from lumen, minimum 
 %! IPRdn IPRdf IPRmin

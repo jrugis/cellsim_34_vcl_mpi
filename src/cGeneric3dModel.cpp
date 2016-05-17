@@ -48,6 +48,8 @@ void cGeneric3dModel::get_parameters(){
 	model_file.close();
 	if(n != PCOUNT) fatal_error("too few parameters in the model parameters file");
 	numt = p[tend] / p[delt];
+	plc_st = p[PLCsrt] / p[delt];
+	plc_ft = p[PLCfin] / p[delt];
 }
 
 void cGeneric3dModel::init_u(){
@@ -358,8 +360,10 @@ void cGeneric3dModel::run(){
 	solvec.resize(VARIABLES * mesh->nodes_count, Eigen::NoChange);
 	rhsvec.resize(VARIABLES * mesh->nodes_count, Eigen::NoChange);
 	solvec = u.col(0);
+	tCalcs plc = p[VPLC];
 	for(long i = 1; i < numt; i++){
 		std::cout << std::fixed << std::setprecision(3) << i * p[delt] << " ";
+		p[VPLC] = ((i < plc_st) or (i > plc_ft)) ? 0.0 : plc;
 		rhsvec = (sparseMass * solvec) + (p[delt] * make_load(i - 1));
 		//*********************************************************
 		//solvec = Amat.llt().solve(rhsvec);

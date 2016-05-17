@@ -25,6 +25,7 @@
 #define MODEL_FILE "cs.dat"
 #ifndef FOUR_VARIABLES
 enum model_parameters{delt, tend, \
+	PLCsrt, PLCfin, \
 	IPRdn, IPRdf, IPRmin, PLCds, PLCdl, \
 	c0, ip0, h0, ct, gama, \
 	kIPR, Kc, Kp, Ki, tau, Dc, \
@@ -34,6 +35,7 @@ enum model_parameters{delt, tend, \
 	PCOUNT};
 #else
 enum model_parameters{delt, tend, \
+	PLCsrt, PLCfin, \
 	IPRdn, IPRdf, IPRmin, PLCds, PLCdl, \
 	c0, ip0, h0, ce0, gama, \
 	kIPR, Kc, Kp, Ki, tau, Dc, Dce, \
@@ -82,7 +84,7 @@ private:
 	cCellMesh *mesh;
 	cVCLSolver *solver;
 	tCalcs p[PCOUNT]; // the model parameters array
-	long numt; // number of time steps
+	long numt, plc_st, plc_ft; // number of time steps, PLC start and finish time steps
 	Eigen::Array<tCalcs, Eigen::Dynamic, MODELNCOUNT> node_data;
 	Eigen::Array<tCalcs, Eigen::Dynamic, MODELECOUNT> element_data;
 };
