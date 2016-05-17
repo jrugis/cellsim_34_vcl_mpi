@@ -120,14 +120,15 @@ cMKLSolver::cMKLSolver(MatrixXXC &Amat) {
     }
     
     // gmres parameters
-    gmres_restarts = 20;  // restart gmres every 20 steps
-    gmres_relative_tol = 1.e-6;
+    gmres_restarts = 20;  // how often to restart gmres
+    gmres_relative_tol = 0.0;
+    gmres_absolute_tol = 1.e-8;  // for comparison with VCL
     
     // allocate workspace for gmres
     MKL_INT tmpsize = ((2 * gmres_restarts + 1) * size + gmres_restarts * (gmres_restarts + 9) / 2 + 1);
     gmres_tmp = new double[tmpsize];
-    gmres_solution = new double[size];
-    gmres_residual = new double[size];
+    // gmres_solution = new double[size];
+    // gmres_residual = new double[size];
     gmres_trvec = new double[size];
 }
 
@@ -139,8 +140,8 @@ cMKLSolver::~cMKLSolver() {
     delete [] ibilut;
     delete [] jbilut;
     delete [] gmres_tmp;
-    delete [] gmres_solution;
-    delete [] gmres_residual;
+    // delete [] gmres_solution;
+    // delete [] gmres_residual;
     delete [] gmres_trvec;
 }
 
@@ -161,8 +162,8 @@ void cMKLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec) {
         solution[i] = 0.0;
     }
     
-    MKL_INT inc = 1;
-    dcopy(&ivar, rhs, &inc, gmres_solution, &inc);
+    // MKL_INT inc = 1;
+    // dcopy(&ivar, rhs, &inc, gmres_solution, &inc);
     
     // initialise gmres
     dfgmres_init(&ivar, solution, rhs, &RCI_request, ipar, dpar, gmres_tmp);
@@ -171,9 +172,13 @@ void cMKLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec) {
     }
     
     // set desired parameters
+    ipar[7] = 1;  // perform maximum iterations test
+    ipar[8] = 1;  // perform residual stopping test
+    ipar[9] = 0; // do not perform the user defined stopping test
     ipar[10] = 1;  // run preconditioned gmres
     ipar[14] = gmres_restarts;  // how often to restart gmres
     dpar[0] = gmres_relative_tol;  // relative tolerance
+    dpar[1] = gmres_absolute_tol;  // absolute tolerance
     
     // check correctness of parameters
     dfgmres_check(&ivar, solution, rhs, &RCI_request, ipar, dpar, gmres_tmp);
@@ -182,38 +187,39 @@ void cMKLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec) {
     }
     
     // start gmres reverse communication
-    bool complete = false;
     dfgmres(&ivar, solution, rhs, &RCI_request, ipar, dpar, gmres_tmp);
-    if (RCI_request == 0) {
-        complete = true;
-    }
+    bool complete = false;
     while (not complete) {
+        // success
+        if (RCI_request == 0) {
+            complete = true;
+        }
         // compute matrix vector multiplication
-        if (RCI_request == 1) {
+        else if (RCI_request == 1) {
             // compute gmres_tmp[ipar[22]-1] = A*gmres_tmp[ipar[21]-1]
             // note: ipar[21] and ipar[22] contain fortran style addresses so we must subtract 1
             char cvar = 'N';
             mkl_dcsrgemv(&cvar, &ivar, Acsr, Ai, Aj, &gmres_tmp[ipar[21] - 1], &gmres_tmp[ipar[22] - 1]);
         }
         // perform stopping test
-        else if (RCI_request == 2) {
-            // Get the current FGMRES solution in the vector gmres_solution[size]
-            ipar[12] = 1;
-    		dfgmres_get(&ivar, solution, gmres_solution, &RCI_request, ipar, dpar, gmres_tmp, &itercount);
-            
-    		// Compute the current true residual via MKL (Sparse) BLAS routines
-    		char cvar = 'N';
-            mkl_dcsrgemv(&cvar, &ivar, Acsr, Ai, Aj, gmres_solution, gmres_residual);
-    		double dvar = -1.0E0;
-    		MKL_INT iv = 1;
-    		daxpy(&ivar, &dvar, rhs, &iv, gmres_residual, &iv);
-    		dvar = dnrm2(&ivar, gmres_residual, &iv);
-            
-            // stop?
-    		if (dvar < 1.e-8) {
-                complete = true;
-            }
-        }
+        // else if (RCI_request == 2) {
+        //     // Get the current FGMRES solution in the vector gmres_solution[size]
+        //     ipar[12] = 1;
+    	// 	dfgmres_get(&ivar, solution, gmres_solution, &RCI_request, ipar, dpar, gmres_tmp, &itercount);
+        //     
+    	// 	// Compute the current true residual via MKL (Sparse) BLAS routines
+    	// 	char cvar = 'N';
+        //     mkl_dcsrgemv(&cvar, &ivar, Acsr, Ai, Aj, gmres_solution, gmres_residual);
+    	// 	double dvar = -1.0E0;
+    	// 	MKL_INT iv = 1;
+    	// 	daxpy(&ivar, &dvar, rhs, &iv, gmres_residual, &iv);
+    	// 	dvar = dnrm2(&ivar, gmres_residual, &iv);
+        //     
+        //  // stop?
+    	// 	if (dvar < 1.e-8) {
+        //         complete = true;
+        //     }
+        // }
         // apply the preconditioner
         else if (RCI_request == 3) {
             char cvar = 'N';
@@ -233,7 +239,9 @@ void cMKLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec) {
         }
         // failed
         else {
-            fatal_error("gmres failed!");
+            std::ostringstream msgstream;
+            msgstream << "fgmres failed: RCI_request " << RCI_request << "!";
+            fatal_error(msgstream.str());
         }
         
         // next gmres call
@@ -245,7 +253,7 @@ void cMKLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec) {
     // get the result and print iteration count
     ipar[12] = 0;
     dfgmres_get(&ivar, solution, rhs, &RCI_request, ipar, dpar, gmres_tmp, &itercount);
-    std::cout << itercount << std::endl;
+    std::cout << itercount << " " << dpar[4] << std::endl;
 }
 
 void cMKLSolver::fatal_error(std::string msg) {
