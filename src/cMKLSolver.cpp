@@ -102,7 +102,7 @@ cMKLSolver::cMKLSolver(MatrixXXC &Amat) {
     dpar[30] = 1.e-5;
     // ilut preconditioner parameters
     double tol = 1.e-5;
-    MKL_INT maxfil = 20;
+    MKL_INT maxfil = 60;
     
     // allocate storage for preconditioner
     MKL_INT ilut_size = (2 * maxfil + 1) * size - maxfil * (maxfil + 1) + 1;
