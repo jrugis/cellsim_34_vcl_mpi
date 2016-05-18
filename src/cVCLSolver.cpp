@@ -52,7 +52,7 @@ void cVCLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec){
     viennacl::copy(rhsvec, vcl_rhs);
     
     // solve
-    viennacl::linalg::gmres_tag my_gmres_tag(1e-8, 500, 20);
+    viennacl::linalg::gmres_tag my_gmres_tag(1e-8, 500, 15);
     vcl_sol = viennacl::linalg::solve(vcl_sparseA, vcl_rhs, my_gmres_tag, *vcl_precond);
     
     // copy/cast data back to Eigen vector
