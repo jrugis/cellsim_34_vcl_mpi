@@ -2,7 +2,7 @@
 #SBATCH -J cellsim_34_vcl
 #SBATCH -A nesi00119          # Project Account
 #SBATCH --time=0:15:00       # Walltime HH:MM:SS
-#SBATCH --mem-per-cpu=16G     # Memory
+#SBATCH --mem-per-cpu=32G     # Memory
 #SBATCH --ntasks=1            # number of tasks
 #SBATCH --cpus-per-task=1     # number of threads
 #SBATCH -C avx                 # sb=Sandybridge wm=Westmere avx=Sandybridge or Ivybridge
@@ -21,7 +21,7 @@ export OMP_NUM_THREADS=1
 # copy mesh and parameters
 cp -f ../../test-ref/cell01m_HARMONIC_100p.msh cs.msh
 cp -f ../../test-ref/generic3d_03-cs.dat cs.dat
-#cp -f ../../test-ref/generic3d_04-cs.dat
+#cp -f ../../test-ref/generic3d_04-cs.dat cs.dat
 
 # run the job
 srun ../generic3d_03
