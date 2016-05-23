@@ -21,6 +21,7 @@
 1. load required modules
   1. module load intel/2015a
   2. module load Python/3.5.0-intel-2015a
+  3. module load CUDA/7.5.18 (for the CUDA version only)
 2. git clone https://github.com/jrugis/cellsim_34_vcl.git
 3. build the simulation code
   1. cd cellsim_34_vcl/pan/build

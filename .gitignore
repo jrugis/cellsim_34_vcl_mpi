@@ -13,5 +13,7 @@ generic3d*
 !test-ref/*.dat
 !pan/test/generic3d_03-cR.bin
 !pan/test/generic3d_04-cR.bin
+!pan/test/generic3d_03_cuda-cR.bin
+!pan/test/generic3d_04_cuda-cR.bin
 __pycache__/
 *.dSYM/
