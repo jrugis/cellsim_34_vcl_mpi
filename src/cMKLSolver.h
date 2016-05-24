@@ -45,8 +45,6 @@ private:
     
     // gmres workspace
     double *gmres_tmp;
-    // double *gmres_solution;
-    // double *gmres_residual;
     double *gmres_trvec;
 };
 

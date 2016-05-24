@@ -2,7 +2,7 @@
 # Required module on pan:
 #     module load intel/2015a
 #     module load Python/3.5.0-intel-2015a
-#     module load CUDA/7.5.18
+#     module load CUDA/7.5.18 (for the CUDA version)
 
 # NOTE: uncomment lines for the 3 or 4 variable model (CPU or CUDA version) respectively
 #
@@ -10,13 +10,13 @@ EXE = generic3d_03
 #EXE = generic3d_03_cuda
 #EXE = generic3d_03_mkl
 #EXE = generic3d_03_debug
-CPP_DEFS =
+CPPFLAGS =
 #
 #EXE = generic3d_04
 #EXE = generic3d_04_cuda
 #EXE = generic3d_04_mkl
 #EXE = generic3d_04_debug
-#CPP_DEFS = -DFOUR_VARIABLES
+#CPPFLAGS = -DFOUR_VARIABLES
 
 # NOTE: uncomment lines for the CPU or CUDA version respectively
 #
@@ -44,12 +44,16 @@ LDFLAGS =
 EIGEN_INC = -I/share/easybuild/RHEL6.3/sandybridge/software/Eigen/3.2.4-ictce-5.4.0/include
 BOOST_INC = -I/share/easybuild/RHEL6.3/sandybridge/software/Boost/1.55.0-goolf-1.5.14-Python-2.7.8/include
 VCL_INC = -I/projects/nesi00119/code/CS_dev/viennacl/ViennaCL-1.7.1
-DEFS = -DNDEBUG
 
-# nothing should need to change below here
+# build in release mode
+CPPFLAGS += -DNDEBUG
+
+##################################################
+#### nothing should need to change below here ####
+##################################################
 
 # add defs/includes
-CXXFLAGS += $(CPP_DEFS) $(DEFS) $(EIGEN_INC) $(BOOST_INC) $(VCL_INC)
+CXXFLAGS += $(CPPFLAGS) $(EIGEN_INC) $(BOOST_INC) $(VCL_INC)
 
 SRC = ../../src
 OBJS = cell_3d.o cGeneric3dModel.o cCellMesh.o cVCLSolver.o cMKLSolver.o

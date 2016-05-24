@@ -12,9 +12,9 @@
 #include <Eigen/Sparse>
 #include "cCellMesh.h"
 #ifdef MKL_SOLVER
-    #include "cMKLSolver.h"
+#include "cMKLSolver.h"
 #else
-    #include "cVCLSolver.h"
+#include "cVCLSolver.h"
 #endif
 
 #ifndef FOUR_VARIABLES
@@ -86,11 +86,11 @@ private:
 	void fatal_error(std::string msg);
 
 	cCellMesh *mesh;
-    #ifdef MKL_SOLVER
-        cMKLSolver *solver;
-    #else
-        cVCLSolver *solver;
-    #endif
+#ifdef MKL_SOLVER
+    cMKLSolver *solver;
+#else
+    cVCLSolver *solver;
+#endif
 	tCalcs p[PCOUNT]; // the model parameters array
 	long numt, plc_st, plc_ft; // number of time steps, PLC start and finish time steps
 	Eigen::Array<tCalcs, Eigen::Dynamic, MODELNCOUNT> node_data;

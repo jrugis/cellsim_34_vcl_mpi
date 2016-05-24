@@ -12,9 +12,9 @@
 #include <Eigen/Dense>
 
 #ifdef MKL_SOLVER
-    #include "cMKLSolver.h"
+#include "cMKLSolver.h"
 #else
-    #include "cVCLSolver.h"
+#include "cVCLSolver.h"
 #endif
 
 typedef double tCoord;

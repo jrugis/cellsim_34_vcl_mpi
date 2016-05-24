@@ -36,7 +36,6 @@ cMKLSolver::cMKLSolver(MatrixXXC &Amat) {
             if (Amat(i, j) != 0) nnz++;
         }
     }
-    std::cout << "<SOLVER> DEBUG: number of non zeros in A: " << nnz << " (sparsity is " << static_cast<double>(nnz) / static_cast<double>(nrows * ncols) * 100.0 << " %)" << std::endl;
     
     // define the job for converting to CSR
     MKL_INT job[8];
@@ -127,8 +126,6 @@ cMKLSolver::cMKLSolver(MatrixXXC &Amat) {
     // allocate workspace for gmres
     MKL_INT tmpsize = ((2 * gmres_restarts + 1) * size + gmres_restarts * (gmres_restarts + 9) / 2 + 1);
     gmres_tmp = new double[tmpsize];
-    // gmres_solution = new double[size];
-    // gmres_residual = new double[size];
     gmres_trvec = new double[size];
 }
 
@@ -140,8 +137,6 @@ cMKLSolver::~cMKLSolver() {
     delete [] ibilut;
     delete [] jbilut;
     delete [] gmres_tmp;
-    // delete [] gmres_solution;
-    // delete [] gmres_residual;
     delete [] gmres_trvec;
 }
 
@@ -161,9 +156,6 @@ void cMKLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec) {
     for (int i = 0; i < size; i++) {
         solution[i] = 0.0;
     }
-    
-    // MKL_INT inc = 1;
-    // dcopy(&ivar, rhs, &inc, gmres_solution, &inc);
     
     // initialise gmres
     dfgmres_init(&ivar, solution, rhs, &RCI_request, ipar, dpar, gmres_tmp);
@@ -201,25 +193,6 @@ void cMKLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec) {
             char cvar = 'N';
             mkl_dcsrgemv(&cvar, &ivar, Acsr, Ai, Aj, &gmres_tmp[ipar[21] - 1], &gmres_tmp[ipar[22] - 1]);
         }
-        // perform stopping test
-        // else if (RCI_request == 2) {
-        //     // Get the current FGMRES solution in the vector gmres_solution[size]
-        //     ipar[12] = 1;
-    	// 	dfgmres_get(&ivar, solution, gmres_solution, &RCI_request, ipar, dpar, gmres_tmp, &itercount);
-        //     
-    	// 	// Compute the current true residual via MKL (Sparse) BLAS routines
-    	// 	char cvar = 'N';
-        //     mkl_dcsrgemv(&cvar, &ivar, Acsr, Ai, Aj, gmres_solution, gmres_residual);
-    	// 	double dvar = -1.0E0;
-    	// 	MKL_INT iv = 1;
-    	// 	daxpy(&ivar, &dvar, rhs, &iv, gmres_residual, &iv);
-    	// 	dvar = dnrm2(&ivar, gmres_residual, &iv);
-        //     
-        //  // stop?
-    	// 	if (dvar < 1.e-8) {
-        //         complete = true;
-        //     }
-        // }
         // apply the preconditioner
         else if (RCI_request == 3) {
             char cvar = 'N';
