@@ -19,7 +19,10 @@
 #include "cCellMesh.h"
 
 cMKLSolver::cMKLSolver(MatrixXXC &Amat) {
-    // NOTE: Amat should be column major (the default for Eigen) as that is what MKL expects
+    // Amat should be column major (the default for Eigen) as that is what MKL expects
+    if (Amat.IsRowMajor) {
+        fatal_error("Supplied dense matrix must be column major!");
+    }
     
 	std::cout << "<SOLVER> initialising the MKL solver..." << std::endl;
     std::cout << "<SOLVER> storing A matrix in sparse format..." << std::endl;
@@ -63,31 +66,6 @@ cMKLSolver::cMKLSolver(MatrixXXC &Amat) {
     if (info != 0) {
         fatal_error("conversion to CSR matrix failed!");
     }
-    
-    // {  // DEBUGGING - check the sparse matrix is correct
-    //     MKL_INT count = 0;
-    //     for (MKL_INT i = 0; i < nrows; i++) {
-    //         if (Ai[i] - job[2] != count) {
-    //             std::cerr << "Error row index incorrect: " << i << ", " << Ai[i] << ", " << count << std::endl;
-    //             exit(36);
-    //         }
-    //         MKL_INT ccnt = 0;
-    //         for (MKL_INT j = 0; j < ncols; j++) {
-    //             double val = Amat(i, j);
-    //             if (val != 0) {
-    //                 if (Acsr[count++] != val) {
-    //                     std::cerr << "Error vals not equal! " << Acsr[count - 1] << " vs " << val << std::endl;
-    //                     exit(35);
-    //                 }
-    //                 MKL_INT colval = Aj[Ai[i] + ccnt++ - job[2]] - job[2];
-    //                 if (colval != j) {
-    //                     std::cerr << "Error with columns: " << colval << ", " << j << std::endl;
-    //                     exit(37);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }  // END DEBUGGING
     
     std::cout << "<SOLVER> computing preconditioner..." << std::endl;
     
@@ -166,7 +144,7 @@ void cMKLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec) {
     // set desired parameters
     ipar[7] = 1;  // perform maximum iterations test
     ipar[8] = 1;  // perform residual stopping test
-    ipar[9] = 0; // do not perform the user defined stopping test
+    ipar[9] = 0;  // do not perform the user defined stopping test
     ipar[10] = 1;  // run preconditioned gmres
     ipar[14] = gmres_restarts;  // how often to restart gmres
     dpar[0] = gmres_relative_tol;  // relative tolerance

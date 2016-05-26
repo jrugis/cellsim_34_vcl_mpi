@@ -53,7 +53,7 @@ enum model_node_values{IPR_n, PLC_n, MODELNCOUNT};            // node spatial fa
 enum model_element_values{VOL_e, IPR_e, PLC_e, MODELECOUNT};  // element volume and spatial factors
 
 // some convenience typedefs
-typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, Eigen::Dynamic> MatrixXXC; // leave as column major otherwise will break MKL solver
+typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, Eigen::Dynamic> MatrixXXC;
 typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, 1> MatrixX1C;
 typedef Eigen::Array<tCalcs, Eigen::Dynamic, 1> ArrayX1C;
 typedef Eigen::Array<tCalcs, 1, VARIABLES> Array1VC;
