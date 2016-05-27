@@ -5,6 +5,8 @@
  *      Author: jrug001
  */
 
+#ifndef MKL_SOLVER
+
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -18,7 +20,7 @@
 #include "cCellMesh.h"
 
 cVCLSolver::cVCLSolver(MatrixXXC &Amat){
-	std::cout << "<SOLVER> initialising the solver..." << std::endl;
+	std::cout << "<SOLVER> initialising the VCL solver..." << std::endl;
     
     // convert A matrix to sparse format
     Eigen::SparseMatrix<tCalcs, Eigen::RowMajor> sparseA;
@@ -71,3 +73,5 @@ void cVCLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec){
     
     std::cout << my_gmres_tag.iters() << " " << my_gmres_tag.error() << std::endl;
 }
+
+#endif
