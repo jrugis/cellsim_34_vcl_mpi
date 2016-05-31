@@ -2,7 +2,7 @@
 # CMakeLists.txt for cellsim_34_vcl
 #
 
-cmake_minimum_required(VERSION 2.8.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 project(cellsim)
 
 # add cmake module path
@@ -37,16 +37,16 @@ endif(NOT BOOST_ROOT)
 
 # find Boost
 find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 # find Eigen3
 find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
+include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 
 # find ViennaCL
 if(${BUILD_SERIAL} OR ${BUILD_OPENMP} OR ${BUILD_CUDA})
     find_package(ViennaCL REQUIRED)
-    include_directories(${VIENNACL_INCLUDE_DIRS})
+    include_directories(SYSTEM ${VIENNACL_INCLUDE_DIRS})
 endif(${BUILD_SERIAL} OR ${BUILD_OPENMP} OR ${BUILD_CUDA})
 
 # find OpenMP
@@ -63,10 +63,10 @@ endif(${BUILD_CUDA})
 if(${BUILD_MKL})
     set(MKL_SDL ON)
     find_package(MKL REQUIRED)
-    include_directories(${MKL_INCLUDE_DIRS})
+    include_directories(SYSTEM ${MKL_INCLUDE_DIRS})
 endif(${BUILD_MKL})
 
-# if intel compiler, add host optimisation to release build
+# if intel compiler, modify flags
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     # force precise floating point calculations
     add_definitions(-fp-model precise)
@@ -112,9 +112,9 @@ endif(${BUILD_OPENMP})
 
 # CUDA version (ViennaCL)
 if(${BUILD_CUDA})
-    # if intel is selected we force gcc instead
+    # if intel is selected we exit
     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-        message("-- WARNING: trying to compile CUDA version with Intel compilers (this probably won't work!)")
+        message(FATAL_ERROR "Cannot currently build CUDA version with Intel compilers (use GCC instead)!")
     endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     
     # three variable

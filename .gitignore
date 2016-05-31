@@ -21,3 +21,4 @@ __pycache__/
 *.dSYM/
 job_*.h5
 build/
+build_cuda/
