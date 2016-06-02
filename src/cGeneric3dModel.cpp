@@ -353,9 +353,9 @@ void cGeneric3dModel::make_matrices(){
                 triplet_list.push_back(Triplet(np + i, np + j, v_ij));
                 
                 #ifdef FOUR_VARIABLES
-            	// mass.block(3*np, 3*np, np, np) = small_mass;
+                // mass.block(3*np, 3*np, np, np) = small_mass;
                 triplet_list.push_back(Triplet(np3 + i, np3 + j, v_ij));
-            	#endif
+                #endif
             }
             
             if (i == j) {
