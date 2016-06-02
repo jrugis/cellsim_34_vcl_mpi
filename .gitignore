@@ -20,3 +20,5 @@ generic3d*
 __pycache__/
 *.dSYM/
 job_*.h5
+build/
+build_cuda/
