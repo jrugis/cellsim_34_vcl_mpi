@@ -12,6 +12,7 @@ typedef double tCalcs;
 
 #include <string>
 #include <Eigen/Dense>
+#include <Eigen/Sparse>
 #include <viennacl/compressed_matrix.hpp>
 #include <viennacl/linalg/ilu.hpp>
 
@@ -19,10 +20,11 @@ typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, Eigen::Dynamic> MatrixXXC;
 typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, 1> MatrixX1C;
 typedef viennacl::compressed_matrix<tCalcs> vcl_sparse_t;
 typedef viennacl::linalg::ilut_precond<vcl_sparse_t> vcl_precond_t;
+typedef Eigen::SparseMatrix<tCalcs> SparseMatrixTCalcs;
 
 class cVCLSolver {
 public:
-	cVCLSolver(MatrixXXC &Amat);
+	cVCLSolver(SparseMatrixTCalcs &sparseA);
 	virtual ~cVCLSolver();
 	void step(MatrixX1C &solvec, MatrixX1C &rhsvec);
 

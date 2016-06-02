@@ -19,12 +19,8 @@
 #include "cVCLSolver.h"
 #include "cCellMesh.h"
 
-cVCLSolver::cVCLSolver(MatrixXXC &Amat){
+cVCLSolver::cVCLSolver(SparseMatrixTCalcs &sparseA){
 	std::cout << "<SOLVER> initialising the VCL solver..." << std::endl;
-    
-    // convert A matrix to sparse format
-    Eigen::SparseMatrix<tCalcs, Eigen::RowMajor> sparseA;
-    sparseA = Amat.sparseView();
     
     // copy A matrix into vcl matrix
     viennacl::copy(sparseA, vcl_sparseA);
@@ -34,7 +30,7 @@ cVCLSolver::cVCLSolver(MatrixXXC &Amat){
 #endif
     
     // number of columns
-    size = Amat.cols();
+    size = sparseA.cols();
     
     // preconditioner configuration
     viennacl::linalg::ilut_tag precond_conf(40, 1e-5);

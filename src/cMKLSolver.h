@@ -17,6 +17,7 @@ typedef double tCalcs;
 
 typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, Eigen::Dynamic> MatrixXXC;
 typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, 1> MatrixX1C;
+typedef Eigen::SparseMatrix<tCalcs> SparseMatrixTCalcs;
 
 
 class cMKLSolver {
