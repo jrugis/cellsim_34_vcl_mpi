@@ -18,53 +18,34 @@
 #include "cMKLSolver.h"
 #include "cCellMesh.h"
 
-cMKLSolver::cMKLSolver(MatrixXXC &Amat) {
-    // Amat should be column major (the default for Eigen) as that is what MKL expects
-    if (Amat.IsRowMajor) {
-        fatal_error("Supplied dense matrix must be column major!");
-    }
-    
+cMKLSolver::cMKLSolver(SparseMatrixTCalcs &sparseA) {
 	std::cout << "<SOLVER> initialising the MKL solver..." << std::endl;
     std::cout << "<SOLVER> storing A matrix in sparse format..." << std::endl;
     
-    // size of A
-    MKL_INT nrows = Amat.rows();
-    MKL_INT ncols = Amat.cols();
-    size = nrows;
-    
-    // calculate the number of non zeros (eigen matrix is column major)
-    MKL_INT nnz = 0;
-    for (MKL_INT j = 0; j < ncols; j++) {
-        for (MKL_INT i = 0; i < nrows; i++) {
-            if (Amat(i, j) != 0) nnz++;
-        }
+    // make matrix compresesd for compatibility with MKL
+    if (not sparseA.isCompressed()) {
+        sparseA.makeCompressed();
     }
     
-    // define the job for converting to CSR
-    MKL_INT job[8];
-    job[0] = 0;  // convert from dense to sparse
-    job[1] = 0;  // zero based indexing for A matrix
-    job[2] = 1;  // one based indexing for CSR matrix (apparently required for gmres!)
-    job[3] = 2;  // adns is whole matrix
-    job[4] = nnz;  // maximum number of non zeros allowed
-    job[5] = 1;  // fill all three CSR arrays
+    // size of A
+    MKL_INT nrows = sparseA.rows();
+    MKL_INT ncols = sparseA.cols();
+    size = nrows;
+    int nnz = sparseA.nonZeros();
     
-    // other parameters
-    MKL_INT lda = nrows;
-    MKL_INT info;
+    // pointer to values (we can use this directly)
+    Acsr = sparseA.valuePtr();
     
-    // pointer to data
-    double *adns = Amat.data();
-    
-    // allocate CSR arrays for A
-    Acsr = new double[nnz];
+    // allocate Aj and Ai arrays and convert to one based indexing
     Aj = new MKL_INT[nnz];
+    int *Ajtmp = sparseA.innerIndexPtr();
+    for (int i = 0; i < nnz; i++) {
+        Aj[i] = Ajtmp[i] + 1;
+    }
     Ai = new MKL_INT[nrows + 1];
-    
-    // convert to MKL CSR format
-    mkl_ddnscsr(job, &nrows, &ncols, adns, &lda, Acsr, Aj, Ai, &info);
-    if (info != 0) {
-        fatal_error("conversion to CSR matrix failed!");
+    int *Aitmp = sparseA.outerIndexPtr();
+    for (int i = 0; i < nrows + 1; i++) {
+        Ai[i] = Aitmp[i] + 1;
     }
     
     std::cout << "<SOLVER> computing preconditioner..." << std::endl;
@@ -108,7 +89,6 @@ cMKLSolver::cMKLSolver(MatrixXXC &Amat) {
 }
 
 cMKLSolver::~cMKLSolver() {
-    delete [] Acsr;
     delete [] Aj;
     delete [] Ai;
     delete [] bilut;

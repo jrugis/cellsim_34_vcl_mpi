@@ -30,9 +30,9 @@ cGeneric3dModel::cGeneric3dModel(cCellMesh *m) {
 	init_u();
 	std::cout << "<MODEL> creating solver object..." << std::endl;
 #ifdef MKL_SOLVER
-    solver = new cMKLSolver(Amat);
+    solver = new cMKLSolver(sparseA);
 #else
-    solver = new cVCLSolver(Amat);
+    solver = new cVCLSolver(sparseA);
 #endif
 }
 
@@ -332,23 +332,81 @@ void cGeneric3dModel::make_matrices(){
 		#endif
 		small_mass(vi(3), vi(2)) = small_mass(vi(2), vi(3));
 	}
-	MatrixXXC mass = mass.Identity(VARIABLES * np, VARIABLES * np); // the mass matrix
-	mass.block(0, 0, np, np) = small_mass;
-	mass.block(np, np, np, np) = small_mass;
-	#ifdef FOUR_VARIABLES
-	mass.block(3*np, 3*np, np, np) = small_mass;
-	#endif
-	sparseMass = mass.sparseView(); // store sparse mass matrix
 
-	MatrixXXC stiff; // the stiffness matrix
-	stiff = stiff.Zero(VARIABLES * np, VARIABLES * np);
-	stiff.block(0, 0, np, np) = stiffc;
-	stiff.block(np, np, np, np) = stiffp;
-	#ifdef FOUR_VARIABLES
-	stiff.block(3*np, 3*np, np, np) = stiffce;
-	#endif
-	Amat.resize(VARIABLES * np, VARIABLES * np); // make the A matrix
-	Amat = mass + (p[delt] * stiff);
+    // construct the mass matrix from a list of triplets (non zero elements)
+    std::vector<Triplet> triplet_list;
+    
+    // construct list of triplets
+    int np2 = np * 2;
+    #ifdef FOUR_VARIABLES
+    int np3 = np * 3;
+    #endif
+    for (int j = 0; j < np; j++) {
+        for (int i = 0; i < np; i++) {
+            double v_ij = small_mass(i, j);
+            // add non zeros in first, second and fourth (if required) blocks
+            if (v_ij != 0) {
+                // mass.block(0, 0, np, np) = small_mass;
+                triplet_list.push_back(Triplet(i, j, v_ij));
+                
+                // mass.block(np, np, np, np) = small_mass;
+                triplet_list.push_back(Triplet(np + i, np + j, v_ij));
+                
+                #ifdef FOUR_VARIABLES
+                // mass.block(3*np, 3*np, np, np) = small_mass;
+                triplet_list.push_back(Triplet(np3 + i, np3 + j, v_ij));
+                #endif
+            }
+            
+            if (i == j) {
+                // set identity in third block
+                triplet_list.push_back(Triplet(np2 + i, np2 + j, 1.0));
+            }
+        }
+    }
+    
+    // create sparse mass matrix from triplets
+    sparseMass.resize(VARIABLES * np, VARIABLES * np);
+    sparseMass.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    
+    // construct stiff matrix from list of triplets
+    triplet_list.clear();
+    
+    // construct list of triplets
+    for (int j = 0; j < np; j++) {
+        for (int i = 0; i < np; i++) {
+            // first block
+            // stiff.block(0, 0, np, np) = stiffc;
+            double v_stiffc = stiffc(i, j);
+            if (v_stiffc != 0) {
+                triplet_list.push_back(Triplet(i, j, v_stiffc));
+            }
+            
+            // second block
+            // stiff.block(np, np, np, np) = stiffp;
+            double v_stiffp = stiffp(i, j);
+            if (v_stiffp != 0) {
+                triplet_list.push_back(Triplet(np + i, np + j, v_stiffp));
+            }
+            
+            #ifdef FOUR_VARIABLES
+            // fourth block
+            // stiff.block(3*np, 3*np, np, np) = stiffce;
+            double v_stiffce = stiffce(i, j);
+            if (v_stiffce != 0) {
+                triplet_list.push_back(Triplet(np3 + i, np3 + j, v_stiffce));
+            }
+            #endif
+        }
+    }
+    
+    // create sparse stiff matrix from triplets
+    SparseMatrixTCalcs sparseStiff(VARIABLES * np, VARIABLES * np);
+    sparseStiff.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    
+    // make the A matrix
+    sparseA.resize(VARIABLES * np, VARIABLES * np);
+    sparseA = sparseMass + (p[delt] * sparseStiff);
 }
 
 ArrayRefMass cGeneric3dModel::make_ref_mass(){

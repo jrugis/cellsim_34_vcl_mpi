@@ -58,6 +58,7 @@ typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, 1> MatrixX1C;
 typedef Eigen::Array<tCalcs, Eigen::Dynamic, 1> ArrayX1C;
 typedef Eigen::Array<tCalcs, 1, VARIABLES> Array1VC;
 typedef Eigen::Array<tCalcs, REF_MASS_SIZE, REF_MASS_SIZE> ArrayRefMass;
+typedef Eigen::Triplet<tCalcs> Triplet;
 
 class cGeneric3dModel {
 public:
@@ -66,8 +67,8 @@ public:
 	void run();
 	void save_results();
 
-	MatrixXXC Amat, u; // A and solution matrices
-	Eigen::SparseMatrix<tCalcs, Eigen::RowMajor> sparseMass; // mass matrix
+	MatrixXXC u; // solution matrix
+	SparseMatrixTCalcs sparseA, sparseMass; // A and mass matrices
 
 private:
 	void get_parameters();
