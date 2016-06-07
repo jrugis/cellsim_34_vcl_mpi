@@ -64,7 +64,7 @@
   3. cp ../../test-ref/generic3d_03-cs.dat cs.dat
   4. ../generic3d_03
 5. check the results
-  1. python cs_reduce.py
+  1. python cs_reduce_min-max.py
   2. python cs_results_r.py
   3. diff cR.bin ../../test-ref/generic3d_03-cR.bin
 
