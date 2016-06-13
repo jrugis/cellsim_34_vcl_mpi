@@ -45,6 +45,11 @@ void cGeneric3dModel::get_parameters(){
 	std::string line;                    // file line buffer
     std::vector <std::string> tokens;    // tokenized line
 
+    // check the file is open
+    if (not model_file.is_open()) {
+        fatal_error("the model parameters file could not be opened");
+    }
+
 	std::cout << "<MODEL> reading model parameters..." << std::endl;
 	int n = 0;   // read in the model parameters
     while(getline(model_file, line)){
