@@ -3,7 +3,7 @@
 #
 
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
-project(cellsim)
+project(cellsim CXX)
 
 # add cmake module path
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -19,9 +19,29 @@ option(FOUR_VARIABLES "Build four variable version" ON)
 # set CXX standard
 add_definitions("-std=c++11")
 
+# detect system for naming executable
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    # we are on a mac
+    set(platform_suffix "_mac")
+elseif(${UNIX})
+    # differentiate between pan and generic linux
+    if(IS_DIRECTORY /gpfs1m/apps AND IS_DIRECTORY /gpfs1m/projects)
+        set(platform_suffix "_pan")
+    else()
+        set(platform_suffix "_linux")
+    endif(IS_DIRECTORY /gpfs1m/apps AND IS_DIRECTORY /gpfs1m/projects)
+else(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(platform_suffix "_unknown")
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+message(STATUS "Platform suffix is: '${platform_suffix}'")
+
+# detect compiler for naming executable
+string(TOLOWER "_${CMAKE_CXX_COMPILER_ID}" compiler_suffix)
+message(STATUS "Compiler suffix is: '${compiler_suffix}'")
+
 # Set release build:
 if(NOT CMAKE_BUILD_TYPE)
-    message("-- No build type detected, defaulting to Release")
+    message(STATUS "No build type detected, defaulting to Release")
     set(CMAKE_BUILD_TYPE "Release")
 endif(NOT CMAKE_BUILD_TYPE)
 
@@ -72,20 +92,24 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     add_definitions(-fp-model precise)
     # add host optimisation
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -xHost -DNDEBUG")
+    # set flags for custom release on pan (optimal on wm and avx)
+    set(CMAKE_CXX_FLAGS_RELPAN "-O3 -xSSE4.2 -axAVX -DNDEBUG")
 endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
 
 # serial version (ViennaCL)
 if(${BUILD_SERIAL})
     # three variable
     if(${THREE_VARIABLES})
-        message("-- Building ViennaCL serial three variable version")
-        add_executable(generic3d_03 ${cpu_src} ${all_headers})
+        set(target_name "generic3d_03${platform_suffix}_vclserial${compiler_suffix}")
+        message(STATUS "Building ViennaCL serial three variable version: ${target_name}")
+        add_executable(${target_name} ${cpu_src} ${all_headers})
     endif(${THREE_VARIABLES})
     # four variable
     if(${FOUR_VARIABLES})
-        message("-- Building ViennaCL serial four variable version")
-        add_executable(generic3d_04 ${cpu_src} ${all_headers})
-        set_property(TARGET generic3d_04 APPEND_STRING PROPERTY COMPILE_DEFINITIONS "FOUR_VARIABLES")
+        set(target_name "generic3d_04${platform_suffix}_vclserial${compiler_suffix}")
+        message(STATUS "Building ViennaCL serial four variable version: ${target_name}")
+        add_executable(${target_name} ${cpu_src} ${all_headers})
+        set_property(TARGET ${target_name} APPEND_STRING PROPERTY COMPILE_DEFINITIONS "FOUR_VARIABLES")
     endif(${FOUR_VARIABLES})
 endif(${BUILD_SERIAL})
 
@@ -93,20 +117,22 @@ endif(${BUILD_SERIAL})
 if(${BUILD_OPENMP})
     # three variable
     if(${THREE_VARIABLES})
-        message("-- Building ViennaCL OpenMP three variable version")
-        add_executable(generic3d_03_openmp ${cpu_src} ${all_headers})
-        set_property(TARGET generic3d_03_openmp APPEND_STRING PROPERTY COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
-        set_property(TARGET generic3d_03_openmp APPEND_STRING PROPERTY LINK_FLAGS "${OpenMP_EXE_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
-        set_property(TARGET generic3d_03_openmp APPEND_STRING PROPERTY COMPILE_DEFINITIONS "VIENNACL_WITH_OPENMP")
+        set(target_name "generic3d_03${platform_suffix}_vclopenmp${compiler_suffix}")
+        message(STATUS "Building ViennaCL OpenMP three variable version: ${target_name}")
+        add_executable(${target_name} ${cpu_src} ${all_headers})
+        set_property(TARGET ${target_name} APPEND_STRING PROPERTY COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
+        set_property(TARGET ${target_name} APPEND_STRING PROPERTY LINK_FLAGS "${OpenMP_EXE_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
+        set_property(TARGET ${target_name} APPEND_STRING PROPERTY COMPILE_DEFINITIONS "VIENNACL_WITH_OPENMP")
     endif(${THREE_VARIABLES})
     # four variable
     if(${FOUR_VARIABLES})
-        message("-- Building ViennaCL OpenMP four variable version")
-        add_executable(generic3d_04_openmp ${cpu_src} ${all_headers})
-        set_property(TARGET generic3d_04_openmp APPEND_STRING PROPERTY COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
-        set_property(TARGET generic3d_04_openmp APPEND_STRING PROPERTY LINK_FLAGS "${OpenMP_EXE_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
-        set_property(TARGET generic3d_04_openmp APPEND_STRING PROPERTY COMPILE_DEFINITIONS "VIENNACL_WITH_OPENMP")
-        set_property(TARGET generic3d_04_openmp APPEND_STRING PROPERTY COMPILE_DEFINITIONS "FOUR_VARIABLES")
+        set(target_name "generic3d_04${platform_suffix}_vclopenmp${compiler_suffix}")
+        message(STATUS "Building ViennaCL OpenMP four variable version: ${target_name}")
+        add_executable(${target_name} ${cpu_src} ${all_headers})
+        set_property(TARGET ${target_name} APPEND_STRING PROPERTY COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
+        set_property(TARGET ${target_name} APPEND_STRING PROPERTY LINK_FLAGS "${OpenMP_EXE_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
+        set_property(TARGET ${target_name} APPEND_STRING PROPERTY COMPILE_DEFINITIONS "VIENNACL_WITH_OPENMP")
+        set_property(TARGET ${target_name} APPEND_STRING PROPERTY COMPILE_DEFINITIONS "FOUR_VARIABLES")
     endif(${FOUR_VARIABLES})
 endif(${BUILD_OPENMP})
 
@@ -119,9 +145,10 @@ if(${BUILD_CUDA})
     
     # three variable
     if(${THREE_VARIABLES})
-        message("-- Building ViennaCL CUDA three variable version")
+        set(target_name "generic3d_03${platform_suffix}_vclcuda${compiler_suffix}")
+        message(STATUS "Building ViennaCL CUDA three variable version: ${target_name}")
         set(DEFINITIONS_STR "-DVIENNACL_WITH_CUDA")
-        cuda_add_executable(generic3d_03_cuda ${cuda_src} ${all_headers}
+        cuda_add_executable(${target_name} ${cuda_src} ${all_headers}
             OPTIONS
                 DEBUG ${DEFINITIONS_STR}
                 RELEASE ${DEFINITIONS_STR}
@@ -131,9 +158,10 @@ if(${BUILD_CUDA})
     endif(${THREE_VARIABLES})
     # four variable
     if(${FOUR_VARIABLES})
-        message("-- Building ViennaCL CUDA four variable version")
+        set(target_name "generic3d_04${platform_suffix}_vclcuda${compiler_suffix}")
+        message(STATUS "Building ViennaCL CUDA four variable version: ${target_name}")
         set(DEFINITIONS_STR "-DVIENNACL_WITH_CUDA -DFOUR_VARIABLES")
-        cuda_add_executable(generic3d_04_cuda ${cuda_src} ${all_headers}
+        cuda_add_executable(${target_name} ${cuda_src} ${all_headers}
             OPTIONS
                 DEBUG ${DEFINITIONS_STR}
                 RELEASE ${DEFINITIONS_STR}
@@ -147,17 +175,19 @@ endif(${BUILD_CUDA})
 if(${BUILD_MKL})
     # three variable
     if(${THREE_VARIABLES})
-        message("-- Building MKL three variable version")
-        add_executable(generic3d_03_mkl ${cpu_src} ${all_headers})
-        target_link_libraries(generic3d_03_mkl ${MKL_LIBRARIES})
-        set_property(TARGET generic3d_03_mkl APPEND_STRING PROPERTY COMPILE_DEFINITIONS "MKL_SOLVER")
+        set(target_name "generic3d_03${platform_suffix}_mkl${compiler_suffix}")
+        message(STATUS "Building MKL three variable version: ${target_name}")
+        add_executable(${target_name} ${cpu_src} ${all_headers})
+        target_link_libraries(${target_name} ${MKL_LIBRARIES})
+        set_property(TARGET ${target_name} APPEND_STRING PROPERTY COMPILE_DEFINITIONS "MKL_SOLVER")
     endif(${THREE_VARIABLES})
     # four variable
     if(${FOUR_VARIABLES})
-        message("-- Building MKL four variable version")
-        add_executable(generic3d_04_mkl ${cpu_src} ${all_headers})
-        target_link_libraries(generic3d_04_mkl ${MKL_LIBRARIES})
-        set_property(TARGET generic3d_04_mkl APPEND_STRING PROPERTY COMPILE_DEFINITIONS "MKL_SOLVER")
-        set_property(TARGET generic3d_04_mkl APPEND_STRING PROPERTY COMPILE_DEFINITIONS "FOUR_VARIABLES")
+        set(target_name "generic3d_04${platform_suffix}_mkl${compiler_suffix}")
+        message(STATUS "Building MKL four variable version: ${target_name}")
+        add_executable(${target_name} ${cpu_src} ${all_headers})
+        target_link_libraries(${target_name} ${MKL_LIBRARIES})
+        set_property(TARGET ${target_name} APPEND_STRING PROPERTY COMPILE_DEFINITIONS "MKL_SOLVER")
+        set_property(TARGET ${target_name} APPEND_STRING PROPERTY COMPILE_DEFINITIONS "FOUR_VARIABLES")
     endif(${FOUR_VARIABLES})
 endif(${BUILD_MKL})
