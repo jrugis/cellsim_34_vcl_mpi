@@ -12,4 +12,4 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(ViennaCL DEFAULT_MSG VIENNACL_INCLUDE_DIR)
 
 set(VIENNACL_INCLUDE_DIRS ${VIENNACL_INCLUDE_DIR})
-mark_as_advanced(VIENNACL_INCLUDE_DIRS)
+mark_as_advanced(VIENNACL_INCLUDE_DIRS VIENNACL_INCLUDE_DIR)
