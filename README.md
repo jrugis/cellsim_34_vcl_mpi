@@ -5,7 +5,7 @@
   1. module load CMake/3.4.1-GCC-4.9.2
   2. module load Python/3.5.1-intel-2015a
 2. git clone https://github.com/jrugis/cellsim_34_vcl.git
-3. build CPU versions with the Intel compiler (CUDA version must be built separately currently)
+3. build CPU versions with the Intel compiler (CUDA version must be built with the GNU compiler currently)
   1. cd cellsim_34_vcl/pan/build
   2. CXX=icpc cmake ../.. -DBUILD_OPENMP=ON -DBUILD_MKL=ON -DCMAKE_BUILD_TYPE=RELPAN
   3. make
@@ -14,10 +14,10 @@
   2. CXX=g++ cmake ../.. -DBUILD_SERIAL=OFF -DBUILD_CUDA=ON
   3. make
 5. run a simulation (e.g. for the ViennaCL serial, 3 variable version)
-  1. cd ../test/vclserial_intel
+  1. cd ../test/vcl-serial-intel
   2. cp ../../../test-ref/cell01m_HARMONIC_100p.msh cs.msh
   3. cp ../../../test-ref/generic3d_03-cs.dat cs.dat
-  4. ../../build/generic3d_03_pan_vclserial_intel
+  4. ../../build/generic3d_03_pan_vcl-serial-intel
 6. check the results
   1. python ../cs_reduce_min-max.py
   2. python ../cs_results_r.py
