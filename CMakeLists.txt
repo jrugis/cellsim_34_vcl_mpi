@@ -39,10 +39,10 @@ message(STATUS "Platform suffix is: '${platform_suffix}'")
 string(TOLOWER "${CMAKE_CXX_COMPILER_ID}" compiler_suffix)
 message(STATUS "Compiler suffix is: '${compiler_suffix}'")
 
-# Set release build:
+# Set RELEASEHOST build:
 if(NOT CMAKE_BUILD_TYPE)
-    message(STATUS "No build type detected, defaulting to Release")
-    set(CMAKE_BUILD_TYPE "Release")
+    message(STATUS "No build type detected, defaulting to RELEASE")
+    set(CMAKE_BUILD_TYPE "RELEASE")
 endif(NOT CMAKE_BUILD_TYPE)
 
 # source
@@ -90,10 +90,21 @@ endif(${BUILD_MKL})
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     # force precise floating point calculations
     add_definitions(-fp-model precise)
-    # add host optimisation
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -xHost -DNDEBUG")
+    
+    # add host optimisation to RELEASEHOST build
+    set(CMAKE_CXX_FLAGS_RELEASEHOST "-O3 -xHost -DNDEBUG")
+    
     # set flags for custom release on pan (optimal on wm and avx)
-    set(CMAKE_CXX_FLAGS_RELPAN "-O3 -xSSE4.2 -axAVX -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELEASEPAN "-O3 -xSSE4.2 -axAVX -DNDEBUG")
+# modify flags on GNU compiler too
+elseif(${CMAKE_COMPILER_IS_GNUCXX})
+    # add host optimisation to RELEASEHOST build
+    set(CMAKE_CXX_FLAGS_RELEASEHOST "-O3 -march=native -mtune=native -DNDEBUG")
+# set defaults
+else(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+    # set defaults
+    set(CMAKE_CXX_FLAGS_RELEASEPAN "${CMAKE_CXX_FLAGS_RELEASE}")
+    set(CMAKE_CXX_FLAGS_RELEASEHOST "${CMAKE_CXX_FLAGS_RELEASE}")
 endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
 
 # serial version (ViennaCL)

@@ -7,7 +7,7 @@
 2. git clone https://github.com/jrugis/cellsim_34_vcl.git
 3. build CPU versions with the Intel compiler (CUDA version must be built with the GNU compiler currently)
   1. cd cellsim_34_vcl/pan/build
-  2. CXX=icpc cmake ../.. -DBUILD_OPENMP=ON -DBUILD_MKL=ON -DCMAKE_BUILD_TYPE=RELPAN
+  2. CXX=icpc cmake ../.. -DBUILD_OPENMP=ON -DBUILD_MKL=ON -DCMAKE_BUILD_TYPE=RELEASEPAN
   3. make
 4. build CUDA versions (all versions can be built with the GNU compiler if the Intel compiler is not available)
   1. cd ../build_cuda
