@@ -100,6 +100,7 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
 elseif(${CMAKE_COMPILER_IS_GNUCXX})
     # add host optimisation to RELEASEHOST build
     set(CMAKE_CXX_FLAGS_RELEASEHOST "-O3 -march=native -mtune=native -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELEASEPAN "-O3 -march=westmere -mtune=sandybridge -DNDEBUG")
 # set defaults
 else(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     # set defaults
