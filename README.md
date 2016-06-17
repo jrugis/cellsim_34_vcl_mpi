@@ -22,6 +22,7 @@
   1. python ../cs_reduce_min-max.py
   2. python ../cs_results_r.py
   3. diff cR.bin generic3d_03-cR.bin
+  4. python ../compare_bin_tol.py cR.bin generic3d_03-cR.bin
 
 ##linux
 1. install eigen and ViennaCL
