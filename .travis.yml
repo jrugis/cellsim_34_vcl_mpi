@@ -2,30 +2,70 @@ sudo: false
 language: cpp
 compiler: gcc
 
-# get dependencies
-before_install:
-    - echo "Before install..."
+cache:
+    directories:
+        - tmp/cmake-3.5.2
+
+# install dependencies
+addons:
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+            - boost-latest
+            
+        packages:
+            - libboost1.55-dev
+            - gcc-4.9
+            - g++-4.9
+
+# install dependencies
+install:
+    - echo "Install..."
+    - export CC=gcc-4.9
+    - export CXX=g++-4.9
+    - export OMP_NUM_THREADS=4
     - pwd
     - ls -l
     - echo "CXX = ${CXX}"
-    - wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz
-    - tar -xzf boost_1_61_0.tar.gz
-    - export BOOST_ROOT=$(pwd)/boost_1_61_0
+    - ls -l /usr/include
+    - ls -l /usr/bin
+    - curdir=$(pwd)
+    - cd ${HOME}
     - wget https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz
-    - tar -xzf viennacl-1.7.1.tar.gz
+    - tar -xzf ViennaCL-1.7.1.tar.gz
     - export VCL_PATH=$(pwd)/ViennaCL-1.7.1
     - wget http://bitbucket.org/eigen/eigen/get/3.2.8.tar.gz
     - tar -xzf 3.2.8.tar.gz
     - export EIGEN_PATH=$(pwd)/eigen-eigen-07105f7124f9
     - ls -l
+    - cd ${curdir}
+    - ls -l
+    - if [ ! -d "tmp/cmake-3.5.2" ]; then export NEED_CMAKE=1; fi
+    - if [ ${NEED_CMAKE} == "1" ]; then mkdir -p tmp; fi
+    - if [ ${NEED_CMAKE} == "1" ]; then cd tmp; fi
+    - if [ ${NEED_CMAKE} == "1" ]; then echo "Installing newer cmake..."; fi
+    - if [ ${NEED_CMAKE} == "1" ]; then wget --no-check-certificate https://cmake.org/files/v3.5/cmake-3.5.2.tar.gz; fi
+    - if [ ${NEED_CMAKE} == "1" ]; then tar -xzf cmake-3.5.2.tar.gz; fi
+    - if [ ${NEED_CMAKE} == "1" ]; then cd cmake-3.5.2; fi
+    - if [ ${NEED_CMAKE} == "1" ]; then ./bootstrap; fi
+    - if [ ${NEED_CMAKE} == "1" ]; then make -j4; fi
+    - if [ ${NEED_CMAKE} == "1" ]; then cd ..; fi
+    - cd ${curdir}
+    - ls -l
+    - ls -l tmp
+    - export PATH=$(pwd)/tmp/cmake-3.5.2/bin:${PATH}
+    - which cmake
+    - cmake --version
 
-install:
-    - echo "Before install..."
+# compile cellsim
+script:
+    - echo "Script..."
     - pwd
     - ls -l
     - echo "CXX = ${CXX}"
     - ${CXX} --version
     - cmake --version
     - mkdir build
-    - cmake .. -DVIENNACL_INCLUDE_DIR="${VCL_PATH}" -DBOOST_ROOT="${BOOST_ROOT}" -DEIGEN_INCLUDE_DIR="${EIGEN_PATH}"
+    - cd build
+    - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH}
     - make
