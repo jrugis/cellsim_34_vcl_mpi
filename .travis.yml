@@ -1,0 +1,31 @@
+sudo: false
+language: cpp
+compiler: gcc
+
+# get dependencies
+before_install:
+    - echo "Before install..."
+    - pwd
+    - ls -l
+    - echo "CXX = ${CXX}"
+    - wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz
+    - tar -xzf boost_1_61_0.tar.gz
+    - export BOOST_ROOT=$(pwd)/boost_1_61_0
+    - wget https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz
+    - tar -xzf viennacl-1.7.1.tar.gz
+    - export VCL_PATH=$(pwd)/ViennaCL-1.7.1
+    - wget http://bitbucket.org/eigen/eigen/get/3.2.8.tar.gz
+    - tar -xzf 3.2.8.tar.gz
+    - export EIGEN_PATH=$(pwd)/eigen-eigen-07105f7124f9
+    - ls -l
+
+install:
+    - echo "Before install..."
+    - pwd
+    - ls -l
+    - echo "CXX = ${CXX}"
+    - ${CXX} --version
+    - cmake --version
+    - mkdir build
+    - cmake .. -DVIENNACL_INCLUDE_DIR="${VCL_PATH}" -DBOOST_ROOT="${BOOST_ROOT}" -DEIGEN_INCLUDE_DIR="${EIGEN_PATH}"
+    - make
