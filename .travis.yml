@@ -5,8 +5,10 @@ compiler: gcc
 cache:
     directories:
         - tmp/cmake-3.5.2
+        - tmp/ViennaCL-1.7.1
+        - tmp/eigen-eigen-07105f7124f9
 
-# install dependencies
+# install apt dependencies
 addons:
     apt:
         sources:
@@ -27,45 +29,45 @@ install:
     - pwd
     - ls -l
     - echo "CXX = ${CXX}"
-    - ls -l /usr/include
-    - ls -l /usr/bin
     - curdir=$(pwd)
-    - cd ${HOME}
-    - wget https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz
-    - tar -xzf ViennaCL-1.7.1.tar.gz
-    - export VCL_PATH=$(pwd)/ViennaCL-1.7.1
-    - wget http://bitbucket.org/eigen/eigen/get/3.2.8.tar.gz
-    - tar -xzf 3.2.8.tar.gz
-    - export EIGEN_PATH=$(pwd)/eigen-eigen-07105f7124f9
-    - ls -l
-    - cd ${curdir}
-    - ls -l
-    - if [ ! -d "tmp/cmake-3.5.2" ]; then export NEED_CMAKE=1; fi
-    - if [ ${NEED_CMAKE} == "1" ]; then mkdir -p tmp; fi
-    - if [ ${NEED_CMAKE} == "1" ]; then cd tmp; fi
-    - if [ ${NEED_CMAKE} == "1" ]; then echo "Installing newer cmake..."; fi
-    - if [ ${NEED_CMAKE} == "1" ]; then wget --no-check-certificate https://cmake.org/files/v3.5/cmake-3.5.2.tar.gz; fi
-    - if [ ${NEED_CMAKE} == "1" ]; then tar -xzf cmake-3.5.2.tar.gz; fi
-    - if [ ${NEED_CMAKE} == "1" ]; then cd cmake-3.5.2; fi
-    - if [ ${NEED_CMAKE} == "1" ]; then ./bootstrap; fi
-    - if [ ${NEED_CMAKE} == "1" ]; then make -j4; fi
-    - if [ ${NEED_CMAKE} == "1" ]; then cd ..; fi
-    - cd ${curdir}
+    - if [ ! -d "tmp/ViennaCL-1.7.1/viennacl" ]; then export GET_VCL=1; fi
+    - if [ "${GET_VCL}" == "1" ]; then mkdir -p tmp; fi
+    - if [ "${GET_VCL}" == "1" ]; then cd tmp; fi
+    - if [ "${GET_VCL}" == "1" ]; then echo "Installing ViennaCL..."; fi
+    - if [ "${GET_VCL}" == "1" ]; then wget https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz; fi
+    - if [ "${GET_VCL}" == "1" ]; then tar -xzf ViennaCL-1.7.1.tar.gz; fi
+    - if [ "${GET_VCL}" == "1" ]; then cd ${curdir}; fi
+    - if [ ! -d "tmp/eigen-eigen-07105f7124f9/Eigen" ]; then export GET_EIGEN=1; fi
+    - if [ "${GET_EIGEN}" == "1" ]; then mkdir -p tmp; fi
+    - if [ "${GET_EIGEN}" == "1" ]; then cd tmp; fi
+    - if [ "${GET_EIGEN}" == "1" ]; then echo "Installing Eigen3..."; fi
+    - if [ "${GET_EIGEN}" == "1" ]; then wget http://bitbucket.org/eigen/eigen/get/3.2.8.tar.gz; fi
+    - if [ "${GET_EIGEN}" == "1" ]; then tar -xzf 3.2.8.tar.gz; fi
+    - if [ "${GET_EIGEN}" == "1" ]; then cd ${curdir}; fi
+    - if [ ! -d "tmp/cmake-3.5.2/bin" ]; then export GET_CMAKE=1; fi
+    - if [ "${GET_CMAKE}" == "1" ]; then mkdir -p tmp; fi
+    - if [ "${GET_CMAKE}" == "1" ]; then cd tmp; fi
+    - if [ "${GET_CMAKE}" == "1" ]; then echo "Installing cmake..."; fi
+    - if [ "${GET_CMAKE}" == "1" ]; then wget --no-check-certificate https://cmake.org/files/v3.5/cmake-3.5.2.tar.gz; fi
+    - if [ "${GET_CMAKE}" == "1" ]; then tar -xzf cmake-3.5.2.tar.gz; fi
+    - if [ "${GET_CMAKE}" == "1" ]; then cd cmake-3.5.2; fi
+    - if [ "${GET_CMAKE}" == "1" ]; then ./bootstrap; fi
+    - if [ "${GET_CMAKE}" == "1" ]; then make -j4; fi
+    - if [ "${GET_CMAKE}" == "1" ]; then cd ${curdir}; fi
     - ls -l
     - ls -l tmp
+    - ls -l tmp/ViennaCL-1.7.1
+    - ls -l tmp/eigen-eigen-07105f7124f9
+    - ls -l tmp/cmake-3.5.2/bin
+    - export VCL_PATH=$(pwd)/tmp/ViennaCL-1.7.1
+    - export EIGEN_PATH=$(pwd)/tmp/eigen-eigen-07105f7124f9
     - export PATH=$(pwd)/tmp/cmake-3.5.2/bin:${PATH}
     - which cmake
     - cmake --version
+    - mkdir build
+    - cd build
 
 # compile cellsim
 script:
-    - echo "Script..."
-    - pwd
-    - ls -l
-    - echo "CXX = ${CXX}"
-    - ${CXX} --version
-    - cmake --version
-    - mkdir build
-    - cd build
     - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH}
-    - make
+    - make -j2
