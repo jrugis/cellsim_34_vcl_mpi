@@ -56,6 +56,12 @@ void cCellMesh::get_mesh(std::string file_name){
 	std::string line;                           // file line buffer
     std::vector <std::string> tokens;           // tokenized line
 
+    // check the file is open
+    if (not cell_file.is_open()) {
+        std::cerr << "<MESH> ERROR: the mesh file could not be opened (" << file_name << ")" << std::endl;
+        exit(1);
+    }
+
     // get the mesh nodes
 	std::cout << "<MESH> getting the mesh nodes..." << std::endl;
 	while(getline(cell_file, line)){

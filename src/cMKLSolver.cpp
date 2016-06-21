@@ -137,9 +137,11 @@ void cMKLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec) {
     }
     
     // start gmres reverse communication
-    dfgmres(&ivar, solution, rhs, &RCI_request, ipar, dpar, gmres_tmp);
     bool complete = false;
     while (not complete) {
+        // call MKL GMRES
+        dfgmres(&ivar, solution, rhs, &RCI_request, ipar, dpar, gmres_tmp);
+        
         // success
         if (RCI_request == 0) {
             complete = true;
@@ -173,11 +175,6 @@ void cMKLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec) {
             std::ostringstream msgstream;
             msgstream << "fgmres failed: RCI_request " << RCI_request << "!";
             fatal_error(msgstream.str());
-        }
-        
-        // next gmres call
-        if (not complete) {
-            dfgmres(&ivar, solution, rhs, &RCI_request, ipar, dpar, gmres_tmp);
         }
     }
     
