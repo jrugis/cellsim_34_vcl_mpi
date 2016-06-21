@@ -3,12 +3,11 @@ sudo: false
 language: cpp
 compiler: gcc
 
-# cache directories for cmake and header libs we're installing
+# cache directories for header libs we're installing
 cache:
     directories:
-        - tmp/cmake-3.5.2
-        - tmp/ViennaCL-1.7.1
-        - tmp/eigen-eigen-07105f7124f9
+        - tmp/ViennaCL-1.7.1/viennacl
+        - tmp/eigen-eigen-07105f7124f9/Eigen
 
 # install apt dependencies
 addons:
@@ -16,46 +15,44 @@ addons:
         sources:
             - ubuntu-toolchain-r-test
             - boost-latest
+            - george-edison55-precise-backports
             
         packages:
             - libboost1.55-dev
             - gcc-4.9
             - g++-4.9
             - python-numpy
+            - cmake
+            - cmake-data
+
+# run the 3 and 4 variable versions in parallel
+env:
+    - MODEL=03
+    - MODEL=04
 
 # install dependencies
 install:
     - export CC=gcc-4.9
     - export CXX=g++-4.9
-    - export OMP_NUM_THREADS=4
+    - ${CXX} --version
+    - cmake --version
     - curdir=$(pwd)
-    - if [ ! -d "tmp/ViennaCL-1.7.1/viennacl" ]; then export GET_VCL=1; fi
+    - export VCL_PATH=${curdir}/tmp/ViennaCL-1.7.1
+    - export EIGEN_PATH=${curdir}/tmp/eigen-eigen-07105f7124f9
+    - if [ ! -f "${VCL_PATH}/viennacl/vector.hpp" ]; then export GET_VCL=1; fi
     - if [ "${GET_VCL}" == "1" ]; then mkdir -p tmp; fi
     - if [ "${GET_VCL}" == "1" ]; then cd tmp; fi
     - if [ "${GET_VCL}" == "1" ]; then echo "Installing ViennaCL..."; fi
     - if [ "${GET_VCL}" == "1" ]; then wget https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz; fi
     - if [ "${GET_VCL}" == "1" ]; then tar -xzf ViennaCL-1.7.1.tar.gz; fi
     - if [ "${GET_VCL}" == "1" ]; then cd ${curdir}; fi
-    - if [ ! -d "tmp/eigen-eigen-07105f7124f9/Eigen" ]; then export GET_EIGEN=1; fi
+    - if [ ! -f "${EIGEN_PATH}/Eigen/src/Core/util/Macros.h" ]; then export GET_EIGEN=1; fi
     - if [ "${GET_EIGEN}" == "1" ]; then mkdir -p tmp; fi
     - if [ "${GET_EIGEN}" == "1" ]; then cd tmp; fi
     - if [ "${GET_EIGEN}" == "1" ]; then echo "Installing Eigen3..."; fi
     - if [ "${GET_EIGEN}" == "1" ]; then wget http://bitbucket.org/eigen/eigen/get/3.2.8.tar.gz; fi
     - if [ "${GET_EIGEN}" == "1" ]; then tar -xzf 3.2.8.tar.gz; fi
     - if [ "${GET_EIGEN}" == "1" ]; then cd ${curdir}; fi
-    - if [ ! -d "tmp/cmake-3.5.2/bin" ]; then export GET_CMAKE=1; fi
-    - if [ "${GET_CMAKE}" == "1" ]; then mkdir -p tmp; fi
-    - if [ "${GET_CMAKE}" == "1" ]; then cd tmp; fi
-    - if [ "${GET_CMAKE}" == "1" ]; then echo "Installing cmake..."; fi
-    - if [ "${GET_CMAKE}" == "1" ]; then wget --no-check-certificate https://cmake.org/files/v3.5/cmake-3.5.2.tar.gz; fi
-    - if [ "${GET_CMAKE}" == "1" ]; then tar -xzf cmake-3.5.2.tar.gz; fi
-    - if [ "${GET_CMAKE}" == "1" ]; then cd cmake-3.5.2; fi
-    - if [ "${GET_CMAKE}" == "1" ]; then ./bootstrap; fi
-    - if [ "${GET_CMAKE}" == "1" ]; then make -j4; fi
-    - if [ "${GET_CMAKE}" == "1" ]; then cd ${curdir}; fi
-    - export VCL_PATH=$(pwd)/tmp/ViennaCL-1.7.1
-    - export EIGEN_PATH=$(pwd)/tmp/eigen-eigen-07105f7124f9
-    - export PATH=$(pwd)/tmp/cmake-3.5.2/bin:${PATH}
 
 # compile cellsim
 script:
@@ -65,7 +62,7 @@ script:
     - make -j2
     - cd ../linux/test
     - cp ../../test-ref/cell01m_HARMONIC_100p.msh cs.msh
-    - cp ../../test-ref/generic3d_03-cs.dat cs.dat
-    - ../../build/generic3d_03_linux_vcl-serial-gnu
+    - cp ../../test-ref/generic3d_${MODEL}-cs.dat cs.dat
+    - ../../build/generic3d_${MODEL}_linux_vcl-serial-gnu
     - python cs_reduce_min-max.py
-    - diff cR.bin ../../test-ref/generic3d_03-cR.bin
+    - diff cR.bin ../../test-ref/generic3d_${MODEL}-cR.bin
