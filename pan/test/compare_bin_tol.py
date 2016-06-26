@@ -5,7 +5,6 @@ Compare two binary files and look for the maximum element-wise difference.
 If the difference is greater than the tolerance print a message and exit.
 
 """
-
 from __future__ import print_function
 import os
 import sys
@@ -15,17 +14,15 @@ import numpy as np
 
 
 def read_file(filename):
-    print("Reading: '%s' " % filename, end="", flush=True)
+    print("Reading: '%s' " % filename)
     with open(filename, "rb") as fh:
         numrows = struct.unpack('l', fh.read(8))[0]
         numcols = struct.unpack('l', fh.read(8))[0]
-        print("(size: %d x %d)... " % (numrows, numcols), end="", flush=True)
         data = np.zeros((numrows, numcols), dtype=np.float32)
         for j in range(numcols):
             for i in range(numrows):
                 val = fh.read(4)
                 data[i][j] = struct.unpack('f', val)[0]
-    print("done", flush=True)    
 
     return data
 

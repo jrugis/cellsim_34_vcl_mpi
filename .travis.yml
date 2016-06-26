@@ -1,0 +1,68 @@
+# run in container
+sudo: false
+language: cpp
+compiler: gcc
+
+# cache directories for header libs we're installing
+cache:
+    directories:
+        - tmp/ViennaCL-1.7.1/viennacl
+        - tmp/eigen-eigen-07105f7124f9/Eigen
+
+# install apt dependencies
+addons:
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+            - boost-latest
+            - george-edison55-precise-backports
+            
+        packages:
+            - libboost1.55-dev
+            - gcc-4.9
+            - g++-4.9
+            - python-numpy
+            - cmake
+            - cmake-data
+
+# run the 3 and 4 variable versions in parallel
+env:
+    - MODEL=03
+    - MODEL=04
+
+# install dependencies
+install:
+    - export CC=gcc-4.9
+    - export CXX=g++-4.9
+    - ${CXX} --version
+    - cmake --version
+    - curdir=$(pwd)
+    - export VCL_PATH=${curdir}/tmp/ViennaCL-1.7.1
+    - export EIGEN_PATH=${curdir}/tmp/eigen-eigen-07105f7124f9
+    - if [ ! -f "${VCL_PATH}/viennacl/vector.hpp" ]; then export GET_VCL=1; fi
+    - if [ "${GET_VCL}" == "1" ]; then mkdir -p tmp; fi
+    - if [ "${GET_VCL}" == "1" ]; then cd tmp; fi
+    - if [ "${GET_VCL}" == "1" ]; then echo "Installing ViennaCL..."; fi
+    - if [ "${GET_VCL}" == "1" ]; then wget https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz; fi
+    - if [ "${GET_VCL}" == "1" ]; then tar -xzf ViennaCL-1.7.1.tar.gz; fi
+    - if [ "${GET_VCL}" == "1" ]; then cd ${curdir}; fi
+    - if [ ! -f "${EIGEN_PATH}/Eigen/src/Core/util/Macros.h" ]; then export GET_EIGEN=1; fi
+    - if [ "${GET_EIGEN}" == "1" ]; then mkdir -p tmp; fi
+    - if [ "${GET_EIGEN}" == "1" ]; then cd tmp; fi
+    - if [ "${GET_EIGEN}" == "1" ]; then echo "Installing Eigen3..."; fi
+    - if [ "${GET_EIGEN}" == "1" ]; then wget http://bitbucket.org/eigen/eigen/get/3.2.8.tar.gz; fi
+    - if [ "${GET_EIGEN}" == "1" ]; then tar -xzf 3.2.8.tar.gz; fi
+    - if [ "${GET_EIGEN}" == "1" ]; then cd ${curdir}; fi
+
+# compile cellsim
+script:
+    - mkdir build
+    - cd build
+    - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH}
+    - make -j2
+    - cd ../linux/test
+    - cp ../../test-ref/cell01m_HARMONIC_100p.msh cs.msh
+    - cp ../../test-ref/generic3d_${MODEL}-cs.dat cs.dat
+    - ../../build/generic3d_${MODEL}_linux_vcl-serial-gnu
+    - python cs_reduce_min-max.py
+    - diff cR.bin ../../test-ref/generic3d_${MODEL}-cR.bin
