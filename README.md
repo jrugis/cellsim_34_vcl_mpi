@@ -31,7 +31,7 @@
   1. cd cellsim_34_vcl/linux/build
   2. edit Makefile
   3. make
-4. run a simulation (e.g. generic3d_03)
+4. run a simulation (e.g. generic3d_04)
   1. cd ../test
   2. cp ../../test-ref/cell01m_HARMONIC_100p.msh cs.msh
   3. cp ../../test-ref/generic3d_03-cs.dat cs.dat
