@@ -14,7 +14,7 @@ CPP_DEFS =
 #
 #CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -Og -Wall -Wextra
 #CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -O3 -pg 
-CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -O3 
+CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -O3 -march=native -mtune=native 
 
 CPP = g++
 CPP_INCLUDES = -I/usr/include/eigen3

@@ -25,7 +25,7 @@
   4. python ../compare_bin_tol.py cR.bin generic3d_03-cR.bin
 
 ##linux
-1. install eigen and ViennaCL
+1. install boost, eigen and ViennaCL
 2. git clone https://github.com/jrugis/cellsim_34_vcl.git
 3. build the simulation code
   1. cd cellsim_34_vcl/linux/build
