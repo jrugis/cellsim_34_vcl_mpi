@@ -1,4 +1,5 @@
 # cellsim_34_vcl
+[![DOI](https://zenodo.org/badge/23023/jrugis/cellsim_34_vcl.svg)](https://zenodo.org/badge/latestdoi/23023/jrugis/cellsim_34_vcl)
 
 ##pan (cmake)
 1. load required modules
