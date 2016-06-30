@@ -43,7 +43,6 @@ install:
     - cd ${curdir}
     - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O tmp/miniconda.sh
     - chmod +x tmp/miniconda.sh
-    - rm -rf tmp/miniconda
     - tmp/miniconda.sh -b -p tmp/miniconda
     - export PATH=${curdir}/tmp/miniconda/bin:${PATH}
     - conda update --yes conda
