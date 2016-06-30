@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import os
 import struct
@@ -28,10 +29,9 @@ def read_write_data(fname):
 ##################################################################
 
 fname = "c"
-print "reducing " + fname + ".bin"
+print("reducing " + fname + ".bin")
 read_write_data(fname)
 
 fname = "ip3"
-print "reducing " + fname + ".bin"
+print("reducing " + fname + ".bin")
 read_write_data(fname)
-

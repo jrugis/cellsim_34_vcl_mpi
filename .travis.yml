@@ -20,8 +20,10 @@ addons:
 
 # run the 3 and 4 variable versions in parallel
 env:
-    - MODEL=03
-    - MODEL=04
+    - MODEL=03 PYTHON=2.7
+    - MODEL=03 PYTHON=3.5
+    - MODEL=04 PYTHON=2.7
+    - MODEL=04 PYTHON=3.5
 
 # install dependencies
 install:
@@ -45,11 +47,9 @@ install:
     - tmp/miniconda.sh -b -p tmp/miniconda
     - export PATH=${curdir}/tmp/miniconda/bin:${PATH}
     - conda update --yes conda
-    - conda create -n testenv --yes numpy scipy python=2.7
+    - conda create -n testenv --yes numpy scipy python=${PYTHON}
     - source activate testenv
     - python --version
-    - python -c "import scipy; print scipy.__version__"
-    - python -c "import numpy; print numpy.version.version"
 
 # compile cellsim
 script:
