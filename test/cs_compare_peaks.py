@@ -85,6 +85,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compare peak locations and values in two cellsim files.")
     parser.add_argument("filenew", help="The new binary file")
     parser.add_argument("fileref", help="The reference binary file")
-    parser.add_argument("-p", "--peaktol", type=float, default=1e-3, help="The percentage tolerance used for comparing maxima values (default=0.001%%)")
+    parser.add_argument("-p", "--peaktol", type=float, default=1e-2, help="The percentage tolerance used for comparing maxima values (default=0.01%%)")
     args = parser.parse_args()
     main(args)
