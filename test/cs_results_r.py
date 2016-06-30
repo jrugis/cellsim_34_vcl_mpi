@@ -1,3 +1,4 @@
+from __future__ import print_function
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -13,7 +14,7 @@ import cs
 # get the simulation time scale
 t_delta, t_end = cs.get_sim_time()
 y = np.linspace(0.0, t_end, t_end/t_delta, endpoint=True)
-print len(y)
+print(len(y))
 
 # plot the calcium and ip3 simulation data
 plt.rcParams['axes.color_cycle'] = ['r', 'g', 'b']
@@ -28,4 +29,3 @@ plt.xlabel('time (s)')
 open('results.pdf', 'w').close()
 plt.savefig('results.pdf')
 plt.show()
-
