@@ -3,6 +3,11 @@ sudo: false
 language: cpp
 compiler: gcc
 
+# cache ViennaCL as can be slow to download
+cache:
+    directories:
+        - tmp/ViennaCL-1.7.1/viennacl
+
 # install apt dependencies
 addons:
     apt:
@@ -34,12 +39,14 @@ install:
     - curdir=$(pwd)
     - mkdir -p tmp
     - cd tmp
-    - wget https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz
-    - tar -xzf ViennaCL-1.7.1.tar.gz
-    - export VCL_PATH=${curdir}/tmp/ViennaCL-1.7.1
     - wget http://bitbucket.org/eigen/eigen/get/3.2.8.tar.gz
     - tar -xzf 3.2.8.tar.gz
     - export EIGEN_PATH=${curdir}/tmp/eigen-eigen-07105f7124f9
+    - export VCL_PATH=${curdir}/tmp/ViennaCL-1.7.1
+    - if [ ! -f "${VCL_PATH}/viennacl/vector.hpp" ]; then export GET_VCL=1; fi
+    - if [ "${GET_VCL}" == "1" ]; then echo "Installing ViennaCL..."; fi
+    - if [ "${GET_VCL}" == "1" ]; then wget https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz; fi
+    - if [ "${GET_VCL}" == "1" ]; then tar -xzf ViennaCL-1.7.1.tar.gz; fi
     - cd ${curdir}
     - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O tmp/miniconda.sh
     - chmod +x tmp/miniconda.sh
