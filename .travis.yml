@@ -70,4 +70,4 @@ script:
     - cp generic3d_${MODEL}-cs.dat cs.dat
     - ../build/generic3d_${MODEL}_linux_vcl-serial-gnu
     - python cs_reduce_min-max.py
-    - python cs_compare_peaks.py cR.bin generic3d_${MODEL}-cR.bin
+    - python cs_compare_peaks.py cR.bin generic3d-cR.bin
