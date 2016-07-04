@@ -23,7 +23,7 @@ def check_peak_times(curve1, maxima1, curve2, maxima2):
         step2 = maxima2[i]
         # allow one time step offset (better as percentage?)
         if math.fabs(step1 - step2) > 1:
-            sys.stderr.write("Error: peak {0} location differs ({1} - {2})\n".format(i, step1, step2))
+            sys.stderr.write("Error: peak {0} locations differ ({1} - {2})\n".format(i, step1, step2))
             sys.exit(2)
 
 
@@ -37,7 +37,7 @@ def check_peak_values(curve1, maxima1, curve2, maxima2, args):
         val2 = curve2[maxima2[i]]
         percdiff = math.fabs((val1 - val2) / val2) * 100.0
         if percdiff > args.peaktol:
-            sys.stderr.write("Error: peak {0} value differs ({1} vs {2} => {3} %)\n".format(i, val1, val2, percdiff))
+            sys.stderr.write("Error: peak {0} values differ ({1} vs {2} => {3} %)\n".format(i, val1, val2, percdiff))
             sys.exit(3)
 
 
@@ -85,6 +85,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compare peak locations and values in two cellsim files.")
     parser.add_argument("filenew", help="The new binary file")
     parser.add_argument("fileref", help="The reference binary file")
-    parser.add_argument("-p", "--peaktol", type=float, default=0.1, help="The percentage tolerance used for comparing maxima values (default=0.1%%)")
+    parser.add_argument("-p", "--peaktol", type=float, default=0.2,
+                        help="The percentage tolerance used for comparing maxima values (default=0.2%%)")
     args = parser.parse_args()
     main(args)
