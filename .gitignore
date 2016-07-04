@@ -2,7 +2,6 @@
 *~
 cs.dat
 cs.msh
-
 *.o
 *.bin
 *.pdf
@@ -10,16 +9,8 @@ cs.msh
 *.out
 *.log
 generic3d*
-!test-ref/*.bin
-!test-ref/*.dat
-!pan/test/vclserial_intel/generic3d_03-cR.bin
-!pan/test/vclserial_intel/generic3d_04-cR.bin
-!pan/test/vclcuda_gnu/generic3d_03-cR.bin
-!pan/test/vclcuda_gnu/generic3d_04-cR.bin
-!pan/test/mkl_intel/generic3d_03-cR.bin
-!pan/test/mkl_intel/generic3d_04-cR.bin
+!test/generic3d-cR.bin
 __pycache__/
 *.dSYM/
 job_*.h5
-build/
-build_cuda/
+build*/

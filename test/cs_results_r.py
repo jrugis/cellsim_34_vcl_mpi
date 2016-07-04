@@ -1,4 +1,3 @@
-
 from __future__ import print_function
 import matplotlib.pyplot as plt
 import numpy as np
@@ -30,4 +29,3 @@ plt.xlabel('time (s)')
 open('results.pdf', 'w').close()
 plt.savefig('results.pdf')
 plt.show()
-

@@ -3,11 +3,10 @@ sudo: false
 language: cpp
 compiler: gcc
 
-# cache directories for header libs we're installing
+# cache ViennaCL as can be slow to download
 cache:
     directories:
         - tmp/ViennaCL-1.7.1/viennacl
-        - tmp/eigen-eigen-07105f7124f9/Eigen
 
 # install apt dependencies
 addons:
@@ -21,14 +20,15 @@ addons:
             - libboost1.55-dev
             - gcc-4.9
             - g++-4.9
-            - python-numpy
             - cmake
             - cmake-data
 
 # run the 3 and 4 variable versions in parallel
 env:
-    - MODEL=03
-    - MODEL=04
+    - MODEL=03 PYTHON=2.7
+    - MODEL=03 PYTHON=3.5
+    - MODEL=04 PYTHON=2.7
+    - MODEL=04 PYTHON=3.5
 
 # install dependencies
 install:
@@ -37,32 +37,37 @@ install:
     - ${CXX} --version
     - cmake --version
     - curdir=$(pwd)
-    - export VCL_PATH=${curdir}/tmp/ViennaCL-1.7.1
+    - mkdir -p tmp
+    - cd tmp
+    - wget http://bitbucket.org/eigen/eigen/get/3.2.8.tar.gz
+    - tar -xzf 3.2.8.tar.gz
     - export EIGEN_PATH=${curdir}/tmp/eigen-eigen-07105f7124f9
+    - export VCL_PATH=${curdir}/tmp/ViennaCL-1.7.1
     - if [ ! -f "${VCL_PATH}/viennacl/vector.hpp" ]; then export GET_VCL=1; fi
-    - if [ "${GET_VCL}" == "1" ]; then mkdir -p tmp; fi
-    - if [ "${GET_VCL}" == "1" ]; then cd tmp; fi
     - if [ "${GET_VCL}" == "1" ]; then echo "Installing ViennaCL..."; fi
     - if [ "${GET_VCL}" == "1" ]; then wget https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz; fi
     - if [ "${GET_VCL}" == "1" ]; then tar -xzf ViennaCL-1.7.1.tar.gz; fi
-    - if [ "${GET_VCL}" == "1" ]; then cd ${curdir}; fi
-    - if [ ! -f "${EIGEN_PATH}/Eigen/src/Core/util/Macros.h" ]; then export GET_EIGEN=1; fi
-    - if [ "${GET_EIGEN}" == "1" ]; then mkdir -p tmp; fi
-    - if [ "${GET_EIGEN}" == "1" ]; then cd tmp; fi
-    - if [ "${GET_EIGEN}" == "1" ]; then echo "Installing Eigen3..."; fi
-    - if [ "${GET_EIGEN}" == "1" ]; then wget http://bitbucket.org/eigen/eigen/get/3.2.8.tar.gz; fi
-    - if [ "${GET_EIGEN}" == "1" ]; then tar -xzf 3.2.8.tar.gz; fi
-    - if [ "${GET_EIGEN}" == "1" ]; then cd ${curdir}; fi
+    - cd ${curdir}
+    - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O tmp/miniconda.sh
+    - chmod +x tmp/miniconda.sh
+    - tmp/miniconda.sh -b -p tmp/miniconda
+    - export PATH=${curdir}/tmp/miniconda/bin:${PATH}
+    - conda update --yes conda
+    - conda create -n testenv --yes numpy scipy python=${PYTHON}
+    - source activate testenv
+    - python --version
 
 # compile cellsim
 script:
     - mkdir build
     - cd build
-    - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH}
-    - make -j2
-    - cd ../linux/test
-    - cp ../../test-ref/cell01m_HARMONIC_100p.msh cs.msh
-    - cp ../../test-ref/generic3d_${MODEL}-cs.dat cs.dat
-    - ../../build/generic3d_${MODEL}_linux_vcl-serial-gnu
+    - if [ "$MODEL" == "03" ]; then MODELDEF="-DFOUR_VARIABLES=OFF"; fi
+    - if [ "$MODEL" == "04" ]; then MODELDEF="-DTHREE_VARIABLES=OFF"; fi
+    - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH} ${MODELDEF}
+    - make
+    - cd ../test
+    - cp cell01m_HARMONIC_100p.msh cs.msh
+    - cp generic3d_${MODEL}-cs.dat cs.dat
+    - ../build/generic3d_${MODEL}_linux_vcl-serial-gnu
     - python cs_reduce_min-max.py
-    - diff cR.bin ../../test-ref/generic3d_${MODEL}-cR.bin
+    - python cs_compare_peaks.py cR.bin generic3d-cR.bin
