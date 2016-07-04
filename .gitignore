@@ -9,8 +9,7 @@ cs.msh
 *.out
 *.log
 generic3d*
-!test/generic3d_03-cR.bin
-!test/generic3d_04-cR.bin
+!test/generic3d-cR.bin
 __pycache__/
 *.dSYM/
 job_*.h5

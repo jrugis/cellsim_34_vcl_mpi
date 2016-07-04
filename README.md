@@ -23,7 +23,7 @@
 6. check the results
   1. python cs_reduce_min-max.py
   2. python cs_results_r.py
-  3. python cs_compare_peaks.py cR.bin generic3d_03-cR.bin
+  3. python cs_compare_peaks.py cR.bin generic3d-cR.bin
 
 ##linux
 1. install boost, eigen and ViennaCL
@@ -40,4 +40,4 @@
 5. check the results
   1. python cs_reduce_min-max.py
   2. python cs_results_r.py
-  3. python cs_compare_peaks.py cR.bin generic3d_03-cR.bin
+  3. python cs_compare_peaks.py cR.bin generic3d-cR.bin
