@@ -468,6 +468,33 @@ void cGeneric3dModel::load_node_data(std::string file_name, int dindex){
 	file.close();
 }
 
+void cGeneric3dModel::save_matrix_reduce(std::string file_name, MatrixXXC mat){
+    // peak value for each row
+    MatrixX1C max_per_row = mat.rowwise().maxCoeff();
+    
+    // which rows have the highest and lowest peaks
+    int max_index, min_index;
+    max_per_row.maxCoeff(&max_index);
+    max_per_row.minCoeff(&min_index);
+    std::cout << "<MODEL> Reducing results in " << file_name << ": " << max_index << " and " << min_index << std::endl;
+    
+    // write data
+    std::ofstream file(file_name.c_str(), std::ios::binary); // create the file
+    tElement rows = 2;
+    tElement cols = mat.cols();
+    float f;
+    int esize = sizeof(f);
+    file.write(reinterpret_cast<char*>(&rows), sizeof(rows));
+    file.write(reinterpret_cast<char*>(&cols), sizeof(cols));
+    for(int j = 0; j < cols; j++){
+        f = mat(max_index, j);  // convert to float for smaller file size
+        file.write(reinterpret_cast<char*>(&f), esize); // column order
+        f = mat(min_index, j);  // convert to float for smaller file size
+        file.write(reinterpret_cast<char*>(&f), esize); // column order
+    }
+    file.close();
+}
+
 void cGeneric3dModel::save_matrix(std::string file_name, MatrixXXC mat){
 	std::ofstream file(file_name.c_str(), std::ios::binary); // create the file
 	tElement rows = mat.rows();
@@ -489,6 +516,10 @@ void cGeneric3dModel::save_results(){
 	tElement np = mesh->nodes_count;
 	save_matrix("c.bin", MatrixXXC(u.block(0, 0, np, numt)));     // calcium
 	save_matrix("ip3.bin", MatrixXXC(u.block(np, 0, np, numt)));  // ip3
+    
+    save_matrix_reduce("cR.bin", MatrixXXC(u.block(0, 0, np, numt)));     // calcium
+    save_matrix_reduce("ip3R.bin", MatrixXXC(u.block(np, 0, np, numt)));  // ip3
+    
 	//save_matrix("d.bin", MatrixXXC(u.block(2 * np, 0, np, numt)));  // d
 	//save_matrix("ce.bin", MatrixXXC(u.block(3 * np, 0, np, numt)));  // ce
 }

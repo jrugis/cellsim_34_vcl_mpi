@@ -84,6 +84,7 @@ private:
 	void make_matrices();
 	void load_node_data(std::string file_name, int dindex);
 	void save_matrix(std::string file_name, MatrixXXC mat);
+    void save_matrix_reduce(std::string file_name, MatrixXXC mat);
 	void fatal_error(std::string msg);
 
 	cCellMesh *mesh;
