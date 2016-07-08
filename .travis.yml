@@ -72,7 +72,7 @@ script:
     - cd ../test
     - cp cell01m_HARMONIC_100p.msh cs.msh
     - cp generic3d_${MODEL}-cs.dat cs.dat
-    - if [ "$PYREDUCE" == "1" ]; then sed -i "" 's/0.05 120 1/0.05 120 0/g' cs.dat; fi
+    - if [ "$PYREDUCE" == "1" ]; then sed -i 's/0.05 120 1/0.05 120 0/g' cs.dat; fi
     - ../build/generic3d_${MODEL}_linux_vcl-serial-gnu
     - if [ "$PYREDUCE" == "1" ]; then python cs_reduce_min-max.py; fi
     - python cs_compare_peaks.py cR.bin generic3d-cR.bin
