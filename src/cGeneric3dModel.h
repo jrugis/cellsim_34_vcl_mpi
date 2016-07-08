@@ -28,7 +28,7 @@
 // the generic 3D model parameters
 #define MODEL_FILE "cs.dat"
 #ifndef FOUR_VARIABLES
-enum model_parameters{delt, tend, \
+enum model_parameters{delt, tend, reduce, \
 	PLCsrt, PLCfin, \
 	IPRdn, IPRdf, IPRmin, PLCds, PLCdl, \
 	c0, ip0, h0, ct, gama, \
@@ -38,7 +38,7 @@ enum model_parameters{delt, tend, \
 	VPLC, Vdeg, K3K, Dp, \
 	PCOUNT};
 #else
-enum model_parameters{delt, tend, \
+enum model_parameters{delt, tend, reduce, \
 	PLCsrt, PLCfin, \
 	IPRdn, IPRdf, IPRmin, PLCds, PLCdl, \
 	c0, ip0, h0, ce0, gama, \

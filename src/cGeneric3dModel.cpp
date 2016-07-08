@@ -514,11 +514,16 @@ void cGeneric3dModel::save_matrix(std::string file_name, MatrixXXC mat){
 
 void cGeneric3dModel::save_results(){
 	tElement np = mesh->nodes_count;
-	save_matrix("c.bin", MatrixXXC(u.block(0, 0, np, numt)));     // calcium
-	save_matrix("ip3.bin", MatrixXXC(u.block(np, 0, np, numt)));  // ip3
     
-    save_matrix_reduce("cR.bin", MatrixXXC(u.block(0, 0, np, numt)));     // calcium
-    save_matrix_reduce("ip3R.bin", MatrixXXC(u.block(np, 0, np, numt)));  // ip3
+    // reduce first or output full results
+    if (p[reduce]) {
+        save_matrix_reduce("cR.bin", MatrixXXC(u.block(0, 0, np, numt)));     // calcium
+        save_matrix_reduce("ip3R.bin", MatrixXXC(u.block(np, 0, np, numt)));  // ip3
+    }
+    else {
+        save_matrix("c.bin", MatrixXXC(u.block(0, 0, np, numt)));     // calcium
+        save_matrix("ip3.bin", MatrixXXC(u.block(np, 0, np, numt)));  // ip3
+    }
     
 	//save_matrix("d.bin", MatrixXXC(u.block(2 * np, 0, np, numt)));  // d
 	//save_matrix("ce.bin", MatrixXXC(u.block(3 * np, 0, np, numt)));  // ce
