@@ -33,11 +33,11 @@
   2. edit Makefile
   3. make
 4. run a simulation (e.g. generic3d_03)
-  1. cd ../../test
-  2. cp cell01m_HARMONIC_100p.msh cs.msh
-  3. cp generic3d_03-cs.dat cs.dat
-  4. ../linux/generic3d_03
+  1. cd ../test
+  2. cp ../../test/cell01m_HARMONIC_100p.msh cs.msh
+  3. cp ../../test/generic3d_03-cs.dat cs.dat
+  4. ../generic3d_03
 5. check the results
-  1. python cs_reduce_min-max.py
-  2. python cs_results_r.py
-  3. python cs_compare_peaks.py cR.bin generic3d-cR.bin
+  1. python ../../test/cs_reduce_min-max.py (only if not already reduced)
+  2. python ../../test/cs_results_r.py
+  3. python ../../test/cs_compare_peaks.py cR.bin ../../test/generic3d-cR.bin
