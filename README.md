@@ -16,14 +16,14 @@
   2. CXX=g++ cmake .. -DBUILD_SERIAL=OFF -DBUILD_CUDA=ON
   3. make
 5. run a simulation (e.g. for the ViennaCL serial, 3 variable version)
-  1. cd ../test
-  2. cp cell01m_HARMONIC_100p.msh cs.msh
-  3. cp generic3d_03-cs.dat cs.dat
-  4. ../build/generic3d_03_pan_vcl-serial-intel
+  1. mkdir ../build/test && cd ../build/test
+  2. cp ../../test/cell01m_HARMONIC_100p.msh cs.msh
+  3. cp ../../test/generic3d_03-cs.dat cs.dat
+  4. ../generic3d_03_pan_vcl-serial-intel
 6. check the results
-  1. python cs_reduce_min-max.py
-  2. python cs_results_r.py
-  3. python cs_compare_peaks.py cR.bin generic3d-cR.bin
+  1. python ../../test/cs_reduce_min-max.py (only if not already reduced)
+  2. python ../../test/cs_results_r.py
+  3. python ../../test/cs_compare_peaks.py cR.bin ../../test/generic3d-cR.bin
 
 ##linux
 1. install boost, eigen and ViennaCL
