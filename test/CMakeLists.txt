@@ -47,3 +47,39 @@ if(${BUILD_SERIAL})
         add_cellsim_test(${target_vcl_serial_04})
     endif(${FOUR_VARIABLES})
 endif(${BUILD_SERIAL})
+
+# OpenMP version (ViennaCL)
+if(${BUILD_OPENMP})
+    # three variable
+    if(${THREE_VARIABLES})
+        add_cellsim_test(${target_vcl_omp_03})
+    endif(${THREE_VARIABLES})
+    # four variable
+    if(${FOUR_VARIABLES})
+        add_cellsim_test(${target_vcl_omp_04})
+    endif(${FOUR_VARIABLES})
+endif(${BUILD_OPENMP})
+
+# CUDA version (ViennaCL)
+if(${BUILD_CUDA})
+    # three variable
+    if(${THREE_VARIABLES})
+        add_cellsim_test(${target_vcl_cuda_03})
+    endif(${THREE_VARIABLES})
+    # four variable
+    if(${FOUR_VARIABLES})
+        add_cellsim_test(${target_vcl_cuda_04})
+    endif(${FOUR_VARIABLES})
+endif(${BUILD_CUDA})
+
+# MKL version
+if(${BUILD_MKL})
+    # three variable
+    if(${THREE_VARIABLES})
+        add_cellsim_test(${target_mkl_03})
+    endif(${THREE_VARIABLES})
+    # four variable
+    if(${FOUR_VARIABLES})
+        add_cellsim_test(${target_mkl_04})
+    endif(${FOUR_VARIABLES})
+endif(${BUILD_MKL})
