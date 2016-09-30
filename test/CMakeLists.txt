@@ -14,6 +14,8 @@ macro(add_cellsim_test TEST_NAME)
             -DTEST_BINARY=$<TARGET_FILE:${TEST_NAME}>
             -DSKIP_COMPARE=${TEST_SKIP_COMPARE}
             -DTEST_PY_REDUCE=OFF
+            -DPYTHONINTERP_FOUND=${PYTHONINTERP_FOUND}
+            -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
             -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake
     )
     set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 3000)
@@ -30,11 +32,16 @@ macro(add_cellsim_test TEST_NAME)
                 -DTEST_BINARY=$<TARGET_FILE:${TEST_NAME}>
                 -DSKIP_COMPARE=${TEST_SKIP_COMPARE}
                 -DTEST_PY_REDUCE=ON
+                -DPYTHONINTERP_FOUND=${PYTHONINTERP_FOUND}
+                -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
                 -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake
         )
         set_tests_properties(${TEST_NAME}_pyreduce PROPERTIES TIMEOUT 3000)
     endif ()
 endmacro(add_cellsim_test)
+
+# python is required for the comparison (we can run cellsim without it though)
+find_package(PythonInterp)
 
 # serial version (ViennaCL)
 if(${BUILD_SERIAL})

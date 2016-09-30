@@ -19,7 +19,7 @@ option(BUILD_OPENMP "Build OpenMP ViennaCL version" OFF)
 option(THREE_VARIABLES "Build three variable version" ON)
 option(FOUR_VARIABLES "Build four variable version" ON)
 option(TEST_SKIP_COMPARE "Skip the comparison part of the tests" OFF)
-option(TEST_PYTHON_REDUCE "Add tests for the python version of reduce" ON)
+option(TEST_PYTHON_REDUCE "Add tests for the python version of reduce" OFF)
 
 # set CXX standard
 add_definitions("-std=c++11")

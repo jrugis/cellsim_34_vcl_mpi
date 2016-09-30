@@ -8,6 +8,8 @@ message(STATUS "  Test src directory: ${TEST_SRC_DIR}")
 message(STATUS "  CellSim binary: ${TEST_BINARY}")
 message(STATUS "  Skip comparison: ${SKIP_COMPARE}")
 message(STATUS "  Python reduce: ${TEST_PY_REDUCE}")
+message(STATUS "  Python found: ${PYTHONINTERP_FOUND}")
+message(STATUS "  Python executable: ${PYTHON_EXECUTABLE}")
 
 #
 # make the test directory
@@ -62,9 +64,8 @@ if (STATUS)
 endif (STATUS)
 
 #
-# python is required for the comparison
+# skip the comparison if python wasn't found
 #
-find_package(PythonInterp)  # we require python for this
 if (NOT PYTHONINTERP_FOUND)
     message(WARNING "Skipping comparison as python not available")
     set(SKIP_COMPARE ON)
