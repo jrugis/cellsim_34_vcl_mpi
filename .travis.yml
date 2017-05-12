@@ -52,7 +52,7 @@ install:
     - if [ "${GET_VCL}" == "1" ]; then wget https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz; fi
     - if [ "${GET_VCL}" == "1" ]; then tar -xzf ViennaCL-1.7.1.tar.gz; fi
     - cd ${curdir}
-    - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O tmp/miniconda.sh
+    - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O tmp/miniconda.sh
     - chmod +x tmp/miniconda.sh
     - tmp/miniconda.sh -b -p tmp/miniconda
     - export PATH=${curdir}/tmp/miniconda/bin:${PATH}
@@ -67,12 +67,8 @@ script:
     - cd build
     - if [ "$MODEL" == "03" ]; then MODELDEF="-DFOUR_VARIABLES=OFF"; fi
     - if [ "$MODEL" == "04" ]; then MODELDEF="-DTHREE_VARIABLES=OFF"; fi
-    - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH} ${MODELDEF}
+    - if [ "$PYREDUCE" == "1" ]; then REDUCEDEF="-DTEST_CXX_REDUCE=OFF"; fi
+    - if [ "$PYREDUCE" == "0" ]; then REDUCEDEF="-DTEST_PYTHON_REDUCE=OFF"; fi
+    - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH} ${MODELDEF} ${REDUCEDEF}
     - make
-    - cd ../test
-    - cp cell01m_HARMONIC_100p.msh cs.msh
-    - cp generic3d_${MODEL}-cs.dat cs.dat
-    - if [ "$PYREDUCE" == "1" ]; then sed -i 's/0.05 120 1/0.05 120 0/g' cs.dat; fi
-    - ../build/src/generic3d_${MODEL}_linux_vcl-serial-gnu
-    - if [ "$PYREDUCE" == "1" ]; then python cs_reduce_min-max.py; fi
-    - python cs_compare_peaks.py cR.bin generic3d-cR.bin
+    - ctest -V
