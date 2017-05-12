@@ -17,27 +17,27 @@ addons:
             - george-edison55-precise-backports
             
         packages:
-            - libboost1.55-dev
-            - gcc-4.9
-            - g++-4.9
+            - libboost1.60-dev
+            - gcc-6
+            - g++-6
             - cmake
             - cmake-data
 
 # tests for 3 & 4 variable, python 2 & 3 and reducing on and off
 env:
     - MODEL=03 PYTHON=2.7 PYREDUCE=0
-    - MODEL=03 PYTHON=3.5 PYREDUCE=0
+    - MODEL=03 PYTHON=3.6 PYREDUCE=0
     - MODEL=04 PYTHON=2.7 PYREDUCE=0
-    - MODEL=04 PYTHON=3.5 PYREDUCE=0
+    - MODEL=04 PYTHON=3.6 PYREDUCE=0
     - MODEL=03 PYTHON=2.7 PYREDUCE=1
-    - MODEL=03 PYTHON=3.5 PYREDUCE=1
+    - MODEL=03 PYTHON=3.6 PYREDUCE=1
     - MODEL=04 PYTHON=2.7 PYREDUCE=1
-    - MODEL=04 PYTHON=3.5 PYREDUCE=1
+    - MODEL=04 PYTHON=3.6 PYREDUCE=1
 
 # install dependencies
 install:
-    - export CC=gcc-4.9
-    - export CXX=g++-4.9
+    - export CC=gcc-6
+    - export CXX=g++-6
     - ${CXX} --version
     - cmake --version
     - curdir=$(pwd)
