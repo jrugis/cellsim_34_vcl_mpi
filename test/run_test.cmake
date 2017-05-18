@@ -10,6 +10,12 @@ message(STATUS "  Skip comparison: ${SKIP_COMPARE}")
 message(STATUS "  Python reduce: ${TEST_PY_REDUCE}")
 message(STATUS "  Python found: ${PYTHONINTERP_FOUND}")
 message(STATUS "  Python executable: ${PYTHON_EXECUTABLE}")
+message(STATUS "  Enable gprof: ${ENABLE_GPROF}")
+if (ENABLE_GPROF)
+    message(STATUS "    gprof: ${GPROF_PROGRAM}")
+    message(STATUS "    gprof2dot: ${GPROF2DOT_PROGRAM}")
+    message(STATUS "    dot: ${DOT_PROGRAM}")
+endif()
 
 #
 # make the test directory
@@ -64,11 +70,61 @@ if (STATUS)
 endif (STATUS)
 
 #
+# Handle the profiling result
+#
+if (ENABLE_GPROF AND GPROF_PROGRAM)
+    message(STATUS "Running gprof")
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E chdir ${TEST_RUN_DIR}
+        ${GPROF_PROGRAM} ${TEST_BINARY}
+        OUTPUT_FILE ${TEST_RUN_DIR}/profile_${TEST_NAME}.txt
+        RESULT_VARIABLE STATUS
+    )
+    message(STATUS "Status of gprof: ${STATUS}")
+
+    if (NOT STATUS)
+        # also try to locate gprof2dot and dot
+        if (GPROF2DOT_PROGRAM AND DOT_PROGRAM)
+            message(STATUS "Running gprof2dot")
+            execute_process(
+                COMMAND ${CMAKE_COMMAND} -E chdir ${TEST_RUN_DIR}
+                ${GPROF2DOT_PROGRAM} --colour-nodes-by-selftime --strip profile_${TEST_NAME}.txt
+                OUTPUT_FILE ${TEST_RUN_DIR}/gprof2dot_output
+                RESULT_VARIABLE STATUS
+            )
+            message(STATUS "Status of gprof2dot: ${STATUS}")
+
+            if (NOT STATUS)
+                message(STATUS "Running dot")
+                execute_process(
+                    COMMAND ${CMAKE_COMMAND} -E chdir ${TEST_RUN_DIR}
+                    ${DOT_PROGRAM} -Tpng -o ${TEST_RUN_DIR}/profile_${TEST_NAME}.png
+                        ${TEST_RUN_DIR}/gprof2dot_output
+                    RESULT_VARIABLE STATUS
+                )
+                message(STATUS "Status of dot: ${STATUS}")
+
+                if (NOT STATUS)
+                    execute_process(
+                        COMMAND ${CMAKE_COMMAND} -E copy
+                        ${TEST_RUN_DIR}/profile_${TEST_NAME}.png
+                        ../profile_${TEST_NAME}.png
+                    )
+                endif()
+            endif()
+        endif()
+    endif()
+elseif (ENABLE_GPROF AND NOT GPROF_PROGRAM)
+    message(WARNING "Skipping gprof as could not locate executable")
+endif ()
+
+#
 # skip the comparison if python wasn't found
 #
 if (NOT PYTHONINTERP_FOUND)
-    message(WARNING "Skipping comparison as python not available")
+    message(WARNING "Python not available: skipping reduction/comparison")
     set(SKIP_COMPARE ON)
+    set(TEST_PY_REDUCE OFF)
 endif()
 
 #

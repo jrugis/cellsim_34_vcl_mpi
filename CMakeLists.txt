@@ -21,6 +21,7 @@ option(FOUR_VARIABLES "Build four variable version" ON)
 option(TEST_SKIP_COMPARE "Skip the comparison part of the tests" OFF)
 option(TEST_CXX_REDUCE "Add tests for the C++ version of reduce" ON)
 option(TEST_PYTHON_REDUCE "Add tests for the python version of reduce" ON)
+option(ENABLE_GPROF "Build executable with gprof-type profiling enabled" OFF)
 
 # set CXX standard
 add_definitions("-std=c++11")
@@ -108,6 +109,28 @@ else(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     set(CMAKE_CXX_FLAGS_RELEASEPAN "${CMAKE_CXX_FLAGS_RELEASE}")
     set(CMAKE_CXX_FLAGS_RELEASEHOST "${CMAKE_CXX_FLAGS_RELEASE}")
 endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+
+# profiling
+if (ENABLE_GPROF)
+    # add -pg compiler option
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+    
+    # also try to find grof programs
+    find_program(GPROF_PROGRAM NAMES gprof)
+    if (NOT GPROF_PROGRAM)
+        message(STATUS "Could not find gprof program")
+    endif()
+    
+    find_program(GPROF2DOT_PROGRAM NAMES gprof2dot.py gprof2dot)
+    if (NOT GPROF2DOT_PROGRAM)
+        message(STATUS "Could not find gprof2dot program")
+    endif()
+    
+    find_program(DOT_PROGRAM NAMES dot)
+    if (NOT DOT_PROGRAM)
+        message(STATUS "Could not find dot program")
+    endif()
+endif ()
 
 # add src directory
 add_subdirectory(src)

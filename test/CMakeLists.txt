@@ -17,6 +17,10 @@ macro(add_cellsim_test TEST_NAME)
                 -DTEST_PY_REDUCE=OFF
                 -DPYTHONINTERP_FOUND=${PYTHONINTERP_FOUND}
                 -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
+                -DENABLE_GPROF=${ENABLE_GPROF}
+                -DGPROF_PROGRAM=${GPROF_PROGRAM}
+                -DGPROF2DOT_PROGRAM=${GPROF2DOT_PROGRAM}
+                -DDOT_PROGRAM=${DOT_PROGRAM}
                 -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake
         )
         set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 3000)
@@ -36,6 +40,10 @@ macro(add_cellsim_test TEST_NAME)
                 -DTEST_PY_REDUCE=ON
                 -DPYTHONINTERP_FOUND=${PYTHONINTERP_FOUND}
                 -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
+                -DENABLE_GPROF=${ENABLE_GPROF}
+                -DGPROF_PROGRAM=${GPROF_PROGRAM}
+                -DGPROF2DOT_PROGRAM=${GPROF2DOT_PROGRAM}
+                -DDOT_PROGRAM=${DOT_PROGRAM}
                 -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake
         )
         set_tests_properties(${TEST_NAME}_pyreduce PROPERTIES TIMEOUT 3000)
