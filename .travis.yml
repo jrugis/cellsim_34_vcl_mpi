@@ -71,4 +71,4 @@ script:
     - if [ "$PYREDUCE" == "0" ]; then REDUCEDEF="-DTEST_PYTHON_REDUCE=OFF"; fi
     - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH} ${MODELDEF} ${REDUCEDEF}
     - make
-    - ctest -V
+    - ctest --output-on-failure
