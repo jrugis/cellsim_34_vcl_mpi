@@ -54,11 +54,6 @@ endif(${BUILD_OPENMP})
 
 # CUDA version (ViennaCL)
 if(${BUILD_CUDA})
-    # if intel is selected we exit
-    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-        message(FATAL_ERROR "Cannot currently build CUDA version with Intel compilers (use GCC instead)!")
-    endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-    
     # three variable
     if(${THREE_VARIABLES})
         set(target_vcl_cuda_03 "generic3d_03_${platform_suffix}_vcl-cuda-${compiler_suffix}" PARENT_SCOPE)

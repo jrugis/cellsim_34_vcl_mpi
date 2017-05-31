@@ -4,21 +4,17 @@
 
 ## pan (cmake)
 1. load required modules
-  1. `module load CMake/3.4.1-GCC-4.9.2`
+  1. `module load CMake/3.6.1`
   2. `module load Python/3.5.1-intel-2015a`
 2. `git clone https://github.com/jrugis/cellsim_34_vcl.git`
-3. build CPU versions with the Intel compiler (CUDA version must be built with the GNU compiler currently)
+3. build the simulation code
   1. `mkdir cellsim_34_vcl/build && cd cellsim_34_vcl/build`
-  2. `CXX=icpc cmake .. -DBUILD_OPENMP=ON -DBUILD_MKL=ON -DCMAKE_BUILD_TYPE=RELEASEPAN`
+  2. `CXX=icpc cmake .. -DBUILD_OPENMP=ON -DBUILD_MKL=ON -DBUILD_CUDA=ON -DCMAKE_BUILD_TYPE=RELEASE`
   3. `make`
-4. build CUDA versions (all versions can be built with the GNU compiler if the Intel compiler is not available)
-  1. `mkdir ../build_cuda && cd ../build_cuda`
-  2. `CXX=g++ cmake .. -DBUILD_SERIAL=OFF -DBUILD_CUDA=ON`
-  3. `make`
-5. run a test simulation
-  * `ctest` (will run all test cases and print a summary)
+4. run a test simulation
+  * `ctest --output-on-failure` (will run all test cases and print a summary)
   * `ctest -N` (will print the names of all available test cases)
-  * `ctest -V -R generic3d_03_pan_vcl-serial-gnu$` (will run the specified test case with verbose output)
+  * `ctest -V -R generic3d_03_pan_vcl-serial-intel$` (will run the specified test case with verbose output)
 
 ## linux
 1. install boost, eigen and ViennaCL
