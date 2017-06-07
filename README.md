@@ -10,7 +10,7 @@
 3. build the simulation code
   1. `mkdir cellsim_34_vcl/build && cd cellsim_34_vcl/build`
   2. `CXX=icpc cmake .. -DBUILD_OPENMP=ON -DBUILD_MKL=ON -DBUILD_CUDA=ON -DCMAKE_BUILD_TYPE=RELEASE`
-  3. `make`
+  3. `make` (the executables will be located in the "src" directory underneath the build directory)
 4. run a test simulation
   * `ctest --output-on-failure` (will run all test cases in serial and print a summary)
   * `ctest -N` (will print the names of all available test cases)
