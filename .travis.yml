@@ -1,4 +1,5 @@
 # run in container
+dist: precise
 sudo: false
 language: cpp
 compiler: gcc
@@ -23,16 +24,14 @@ addons:
             - cmake
             - cmake-data
 
-# tests for 3 & 4 variable, python 2 & 3 and reducing on and off
+# different test cases
 env:
-    - MODEL=03 PYTHON=2.7 PYREDUCE=0
-    - MODEL=03 PYTHON=3.6 PYREDUCE=0
-    - MODEL=04 PYTHON=2.7 PYREDUCE=0
-    - MODEL=04 PYTHON=3.6 PYREDUCE=0
-    - MODEL=03 PYTHON=2.7 PYREDUCE=1
-    - MODEL=03 PYTHON=3.6 PYREDUCE=1
-    - MODEL=04 PYTHON=2.7 PYREDUCE=1
-    - MODEL=04 PYTHON=3.6 PYREDUCE=1
+    - MODEL=03 PYTHON=3.6 PYREDUCE=0 BUILD_OMP=0
+    - MODEL=04 PYTHON=3.6 PYREDUCE=0 BUILD_OMP=0  # check both 3 and 4 variable work (no python reduce)
+    - MODEL=03 PYTHON=2.7 PYREDUCE=1 BUILD_OMP=0
+    - MODEL=03 PYTHON=3.6 PYREDUCE=1 BUILD_OMP=0  # check python reduce works with both python 2 and 3 (3 variable)
+    - MODEL=04 PYTHON=2.7 PYREDUCE=1 BUILD_OMP=0  # check python reduce works with 4 variable
+    - MODEL=03 PYTHON=3.6 PYREDUCE=0 BUILD_OMP=1  # check OpenMP version works
 
 # install dependencies
 install:
@@ -69,7 +68,10 @@ script:
     - if [ "$MODEL" == "04" ]; then MODELDEF="-DTHREE_VARIABLES=OFF"; fi
     - if [ "$PYREDUCE" == "1" ]; then REDUCEDEF="-DTEST_CXX_REDUCE=OFF"; fi
     - if [ "$PYREDUCE" == "0" ]; then REDUCEDEF="-DTEST_PYTHON_REDUCE=OFF"; fi
-    - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH} ${MODELDEF} ${REDUCEDEF}
+    - if [ "$BUILD_OMP" == "1" ]; then BUILD_DEF="-DBUILD_SERIAL=OFF -DBUILD_OPENMP=ON"; fi
+    - if [ "$BUILD_OMP" == "0" ]; then BUILD_DEF="-DBUILD_SERIAL=ON -DBUILD_OPENMP=OFF"; fi
+    - echo "cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH} ${BUILD_DEF} ${MODELDEF} ${REDUCEDEF}"
+    - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH} ${BUILD_DEF} ${MODELDEF} ${REDUCEDEF}
     - make
     - export OMP_NUM_THREADS=4  # https://docs.travis-ci.com/user/languages/cpp/#OpenMP-projects
     - ctest --output-on-failure
