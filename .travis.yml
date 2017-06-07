@@ -71,4 +71,5 @@ script:
     - if [ "$PYREDUCE" == "0" ]; then REDUCEDEF="-DTEST_PYTHON_REDUCE=OFF"; fi
     - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH} ${MODELDEF} ${REDUCEDEF}
     - make
+    - export OMP_NUM_THREADS=4  # https://docs.travis-ci.com/user/languages/cpp/#OpenMP-projects
     - ctest --output-on-failure
