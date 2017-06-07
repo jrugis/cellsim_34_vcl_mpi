@@ -12,9 +12,10 @@
   2. `CXX=icpc cmake .. -DBUILD_OPENMP=ON -DBUILD_MKL=ON -DBUILD_CUDA=ON -DCMAKE_BUILD_TYPE=RELEASE`
   3. `make`
 4. run a test simulation
-  * `ctest --output-on-failure` (will run all test cases and print a summary)
+  * `ctest --output-on-failure` (will run all test cases in serial and print a summary)
   * `ctest -N` (will print the names of all available test cases)
   * `ctest -V -R generic3d_03_pan_vcl-serial-intel$` (will run the specified test case with verbose output)
+  * `ctest -j4` (will run all test cases in parallel, using 4 threads)
 
 ## linux
 1. install boost, eigen and ViennaCL
