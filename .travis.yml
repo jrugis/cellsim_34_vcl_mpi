@@ -1,4 +1,5 @@
 # run in container
+dist: precise
 sudo: false
 language: cpp
 compiler: gcc
@@ -18,26 +19,25 @@ addons:
             
         packages:
             - libboost1.55-dev
-            - gcc-4.9
-            - g++-4.9
+            - gcc-6
+            - g++-6
             - cmake
             - cmake-data
 
-# tests for 3 & 4 variable, python 2 & 3 and reducing on and off
+# different test cases
 env:
-    - MODEL=03 PYTHON=2.7 PYREDUCE=0
-    - MODEL=03 PYTHON=3.5 PYREDUCE=0
-    - MODEL=04 PYTHON=2.7 PYREDUCE=0
-    - MODEL=04 PYTHON=3.5 PYREDUCE=0
-    - MODEL=03 PYTHON=2.7 PYREDUCE=1
-    - MODEL=03 PYTHON=3.5 PYREDUCE=1
-    - MODEL=04 PYTHON=2.7 PYREDUCE=1
-    - MODEL=04 PYTHON=3.5 PYREDUCE=1
+    - MODEL=03 PYTHON=3.6 PYREDUCE=0 OMP=0 MKL=0
+    - MODEL=04 PYTHON=3.6 PYREDUCE=0 OMP=0 MKL=0  # check both 3 and 4 variable work (no python reduce)
+    - MODEL=03 PYTHON=2.7 PYREDUCE=1 OMP=0 MKL=0
+    - MODEL=03 PYTHON=3.6 PYREDUCE=1 OMP=0 MKL=0  # check python reduce works with both python 2 and 3 (3 variable)
+    - MODEL=04 PYTHON=2.7 PYREDUCE=1 OMP=0 MKL=0  # check python reduce works with 4 variable
+    - MODEL=03 PYTHON=3.6 PYREDUCE=0 OMP=1 MKL=0  # check OpenMP version works
+#    - MODEL=03 PYTHON=3.6 PYREDUCE=0 OMP=0 MKL=1  # check MKL version works
 
 # install dependencies
 install:
-    - export CC=gcc-4.9
-    - export CXX=g++-4.9
+    - export CC=gcc-6
+    - export CXX=g++-6
     - ${CXX} --version
     - cmake --version
     - curdir=$(pwd)
@@ -52,14 +52,16 @@ install:
     - if [ "${GET_VCL}" == "1" ]; then wget https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.tar.gz; fi
     - if [ "${GET_VCL}" == "1" ]; then tar -xzf ViennaCL-1.7.1.tar.gz; fi
     - cd ${curdir}
-    - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O tmp/miniconda.sh
+    - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O tmp/miniconda.sh
     - chmod +x tmp/miniconda.sh
     - tmp/miniconda.sh -b -p tmp/miniconda
     - export PATH=${curdir}/tmp/miniconda/bin:${PATH}
     - conda update --yes conda
-    - conda create -n testenv --yes numpy scipy python=${PYTHON}
+    - conda create -n testenv --yes mkl numpy scipy python=${PYTHON}
     - source activate testenv
     - python --version
+    - export MKL_ROOT=$(dirname $(dirname $(which python)))
+    - echo "MKL_ROOT = ${MKL_ROOT}"
 
 # compile cellsim
 script:
@@ -67,12 +69,14 @@ script:
     - cd build
     - if [ "$MODEL" == "03" ]; then MODELDEF="-DFOUR_VARIABLES=OFF"; fi
     - if [ "$MODEL" == "04" ]; then MODELDEF="-DTHREE_VARIABLES=OFF"; fi
-    - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH} ${MODELDEF}
+    - if [ "$PYREDUCE" == "1" ]; then REDUCEDEF="-DTEST_CXX_REDUCE=OFF"; fi
+    - if [ "$PYREDUCE" == "0" ]; then REDUCEDEF="-DTEST_PYTHON_REDUCE=OFF"; fi
+    - if [ "$OMP" == "1" ]; then BUILD_DEF="-DBUILD_SERIAL=OFF -DBUILD_OPENMP=ON"; fi
+    - if [ "$OMP" == "0" ]; then BUILD_DEF=""; fi
+    - if [ "$MKL" == "1" ]; then BUILD_DEF="-DBUILD_SERIAL=OFF -DBUILD_MKL=ON"; fi
+    - if [ "$MKL" == "0" ]; then BUILD_DEF=""; fi
+    - echo "cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH} ${BUILD_DEF} ${MODELDEF} ${REDUCEDEF}"
+    - cmake .. -DVIENNACL_INCLUDE_DIR=${VCL_PATH} -DEIGEN3_INCLUDE_DIR=${EIGEN_PATH} ${BUILD_DEF} ${MODELDEF} ${REDUCEDEF}
     - make
-    - cd ../test
-    - cp cell01m_HARMONIC_100p.msh cs.msh
-    - cp generic3d_${MODEL}-cs.dat cs.dat
-    - if [ "$PYREDUCE" == "1" ]; then sed -i 's/0.05 120 1/0.05 120 0/g' cs.dat; fi
-    - ../build/generic3d_${MODEL}_linux_vcl-serial-gnu
-    - if [ "$PYREDUCE" == "1" ]; then python cs_reduce_min-max.py; fi
-    - python cs_compare_peaks.py cR.bin generic3d-cR.bin
+    - export OMP_NUM_THREADS=4  # https://docs.travis-ci.com/user/languages/cpp/#OpenMP-projects
+    - ctest --output-on-failure
