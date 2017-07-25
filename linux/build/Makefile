@@ -16,8 +16,9 @@ CPP_DEFS =
 #CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -O3 -pg 
 CPP_FLAGS =  $(CPP_DEFS) $(CPP_INCLUDES) -m64 -O3 -march=native -mtune=native 
 
-CPP = g++
-CPP_INCLUDES = -I/usr/include/eigen3
+#CPP = g++
+CPP = mpicxx
+CPP_INCLUDES = -I/usr/include -I/usr/include/eigen3
 
 OBJS = cell_3d.o cGeneric3dModel.o cCellMesh.o cVCLSolver.o
 SRC = ../../src
