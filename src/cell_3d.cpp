@@ -8,7 +8,6 @@
  ============================================================================
  */
 
-#define MESH_FILE "cs.msh"
 #include <iostream>
 #include <sys/time.h>
 #include <unistd.h>
@@ -60,8 +59,8 @@ int main(int argc,char **args){
 
   // read in the mesh file and display some mesh information
   std::cout << "<MAIN " << commRank << "/" << commSize << "> creating mesh object..." << std::endl;
-  //mesh_00 = new cCellMesh(MESH_FILE, commRank);
-  //mesh_00->print_info();
+  mesh_00 = new cCellMesh(commRank);
+  mesh_00->print_info();
 
   // setup and run a model
   //  - reads in a model parameter file
@@ -76,7 +75,7 @@ int main(int argc,char **args){
   std::cout << "<MAIN " << commRank << "/" << commSize << "> execution time: " << duration << " sec" << std::endl;
 
   //delete model;
-  //delete mesh_00;
+  delete mesh_00;
 
   // shutdown mpi
   MPI_CHECK(MPI_Finalize());

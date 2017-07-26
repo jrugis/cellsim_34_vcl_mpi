@@ -24,7 +24,7 @@ enum mesh_node_values{dist_lumen, dist_surface, MESHNCOUNT};
 
 class cCellMesh {
 public:
-	cCellMesh(std::string filename);
+	cCellMesh(int commRank);
 	virtual ~cCellMesh();
 	void print_info();
 
@@ -37,6 +37,7 @@ public:
 	Eigen::Array<bool, Eigen::Dynamic, 1> surface_node;
 
 private:
+	std::string filename;
 	void get_mesh(std::string file_name);
 	void calc_dist();
 };
