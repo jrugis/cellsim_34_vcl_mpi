@@ -1,8 +1,7 @@
 /*
  * cGeneric3dModel.h
  *
- *  Created on: 04/05/2016
- *      Author: jrugis
+ * Author: jrugis
  */
 
 #ifndef CGENERIC3DMODEL_H_
@@ -10,6 +9,7 @@
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+#include <fstream>
 #include "cCellMesh.h"
 #ifdef MKL_SOLVER
 #include "cMKLSolver.h"
@@ -26,7 +26,6 @@
 #define REF_MASS_SIZE 4   // reference mass dimension
 
 // the generic 3D model parameters
-#define MODEL_FILE "cs.dat"
 #ifndef FOUR_VARIABLES
 enum model_parameters{delt, tend, reduce, \
 	PLCsrt, PLCfin, \
@@ -62,41 +61,43 @@ typedef Eigen::Triplet<tCalcs> Triplet;
 
 class cGeneric3dModel {
 public:
-	cGeneric3dModel(cCellMesh *mesh);
-	virtual ~cGeneric3dModel();
-	void run();
-	void save_results();
+  cGeneric3dModel(cCellMesh *mesh, std::fstream *fstr);
+  virtual ~cGeneric3dModel();
+  void run();
+  void save_results();
 
-	MatrixXXC u; // solution matrix
-	SparseMatrixTCalcs sparseA, sparseMass; // A and mass matrices
+  MatrixXXC u; // solution matrix
+  SparseMatrixTCalcs sparseA, sparseMass; // A and mass matrices
 
 private:
-	void get_parameters();
-	void init_u();
-	MatrixX1C make_load(long i);
-	ArrayRefMass make_ref_mass();
-	#ifndef FOUR_VARIABLES
-	Array1VC getbodyreactions(tCalcs c, tCalcs ip, tCalcs h, tCalcs ipr_f, tCalcs plc_f);
-	#else
-	Array1VC getbodyreactions(tCalcs c, tCalcs ip, tCalcs h, tCalcs ce, tCalcs ipr_f, tCalcs plc_f);
-	#endif
-	tCalcs getboundaryflux(tCalcs c);
-	void make_matrices();
-	void load_node_data(std::string file_name, int dindex);
-	void save_matrix(std::string file_name, MatrixXXC mat);
-    void save_matrix_reduce(std::string file_name, MatrixXXC mat);
-	void fatal_error(std::string msg);
-
-	cCellMesh *mesh;
-#ifdef MKL_SOLVER
-    cMKLSolver *solver;
+  std::fstream *fs;
+  void get_parameters();
+  void init_u();
+  MatrixX1C make_load(long i);
+  ArrayRefMass make_ref_mass();
+#ifndef FOUR_VARIABLES
+  Array1VC getbodyreactions(tCalcs c, tCalcs ip, tCalcs h, tCalcs ipr_f, tCalcs plc_f);
 #else
-    cVCLSolver *solver;
+  Array1VC getbodyreactions(tCalcs c, tCalcs ip, tCalcs h, tCalcs ce, tCalcs ipr_f, tCalcs plc_f);
 #endif
-	tCalcs p[PCOUNT]; // the model parameters array
-	long numt, plc_st, plc_ft; // number of time steps, PLC start and finish time steps
-	Eigen::Array<tCalcs, Eigen::Dynamic, MODELNCOUNT> node_data;
-	Eigen::Array<tCalcs, Eigen::Dynamic, MODELECOUNT> element_data;
+  tCalcs getboundaryflux(tCalcs c);
+  void make_matrices();
+  void load_node_data(std::string file_name, int dindex);
+  void save_matrix(std::string file_name, MatrixXXC mat);
+  void save_matrix_reduce(std::string file_name, MatrixXXC mat);
+  void fatal_error(std::string msg);
+
+  cCellMesh *mesh;
+#ifdef MKL_SOLVER
+  cMKLSolver *solver;
+#else
+  cVCLSolver *solver;
+#endif
+  tCalcs p[PCOUNT]; // the model parameters array
+  long numt, plc_st, plc_ft; // number of time steps, PLC start and finish time steps
+  Eigen::Array<tCalcs, Eigen::Dynamic, MODELNCOUNT> node_data;
+  Eigen::Array<tCalcs, Eigen::Dynamic, MODELECOUNT> element_data;
 };
 
 #endif /* CGENERIC3DMODEL_H_ */
+

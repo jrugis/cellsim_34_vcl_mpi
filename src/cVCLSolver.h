@@ -1,8 +1,7 @@
 /*
  * cVCLSolver.h
  *
- *  Created on: Mar 7, 2016
- *      Author: jrug001
+ * Author: jrug001
  */
 
 #ifndef CVCLSOLVER_H_
@@ -13,6 +12,7 @@ typedef double tCalcs;
 #include <string>
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+#include <fstream>
 #include <viennacl/compressed_matrix.hpp>
 #include <viennacl/linalg/ilu.hpp>
 
@@ -24,17 +24,15 @@ typedef Eigen::SparseMatrix<tCalcs> SparseMatrixTCalcs;
 
 class cVCLSolver {
 public:
-	cVCLSolver(SparseMatrixTCalcs &sparseA);
-	virtual ~cVCLSolver();
-	void step(MatrixX1C &solvec, MatrixX1C &rhsvec);
+  cVCLSolver(SparseMatrixTCalcs &sparseA, std::fstream *fstr);
+  virtual ~cVCLSolver();
+  void step(MatrixX1C &solvec, MatrixX1C &rhsvec);
 
 private:
-    // sparse matrix for passing to ViennaCL
-    vcl_sparse_t vcl_sparseA;
-    // number of columns
-    int size;
-    // preconditioner for passing to gmres
-    vcl_precond_t  *vcl_precond;
+  std::fstream *fs;
+  vcl_sparse_t vcl_sparseA;    // sparse matrix for passing to ViennaCL
+  int size;                    // number of columns
+  vcl_precond_t  *vcl_precond; // preconditioner for passing to gmres
 };
 
 #endif /* CVCLSOLVER_H_ */

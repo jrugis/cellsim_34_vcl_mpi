@@ -65,7 +65,7 @@ def get_part_data(fname):
 # get simulation time data
 def get_sim_time():
   #fname = subprocess.check_output("ls *.dat", shell=True).split()[0]
-  fname = "cs.dat"
+  fname = "cs1.dat"
   f1 = open(fname, "r")
   for line in f1:
     if line.startswith("%! delT totalT"):

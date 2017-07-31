@@ -19,17 +19,17 @@
 
 ## linux
 1. install boost, eigen and ViennaCL
-2. git clone https://github.com/jrugis/cellsim_34_vcl.git
+2. git clone https://github.com/jrugis/cellsim_34_vcl_mpi.git
 3. build the simulation code
-   1. cd cellsim_34_vcl/linux/build
+   1. cd cellsim_34_vcl_mpi/linux/build
    2. edit Makefile
    3. make
 4. run a simulation (e.g. generic3d_03)
    1. cd ../test
-   2. cp ../../test/cell01m_HARMONIC_100p.msh cs.msh
-   3. cp ../../test/generic3d_03-cs.dat cs.dat
+   2. cp ../../test/cell01m_HARMONIC_100p.msh cs1.msh
+   3. cp ../../test/generic3d_03-cs.dat cs1.dat
    4. ../generic3d_03
 5. check the results
    1. python ../../test/cs_reduce_min-max.py (only if not already reduced)
    2. python ../../test/cs_results_r.py
-   3. python ../../test/cs_compare_peaks.py cR.bin ../../test/generic3d-cR.bin
+   3. python ../../test/cs_compare_peaks.py cR1.bin ../../test/generic3d-cR.bin

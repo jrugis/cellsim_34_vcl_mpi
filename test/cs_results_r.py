@@ -20,10 +20,10 @@ print(len(y))
 plt.rcParams['axes.color_cycle'] = ['r', 'g', 'b']
 fig, plots = plt.subplots(2, sharex=True)
 plots[0].set_title('calcium')
-plots[0].plot(y, np.transpose(cs.get_data('cR.bin')), lw=0.5)
+plots[0].plot(y, np.transpose(cs.get_data('cR1.bin')), lw=0.5)
 plots[1].set_title('ip3')
 plots[1].set_ylabel("concentration (uM)")
-plots[1].plot(y, np.transpose(cs.get_data('ip3R.bin')), lw=0.5)
+plots[1].plot(y, np.transpose(cs.get_data('ip3R1.bin')), lw=0.5)
 plt.xlabel('time (s)')
 
 open('results.pdf', 'w').close()

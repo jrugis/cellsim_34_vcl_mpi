@@ -9,6 +9,7 @@
  */
 
 #include <iostream>
+#include <fstream>
 #include <sys/time.h>
 #include <unistd.h>
 #include <mpi.h>
@@ -42,6 +43,7 @@ int main(int argc,char **args){
   struct timeval start, end;
   int duration;
   std::string host_name;
+  std::fstream fs;
 
   gettimeofday(&start, NULL); // get the time
 
@@ -55,29 +57,31 @@ int main(int argc,char **args){
   MPI_CHECK(MPI_Comm_size(MPI_COMM_WORLD, &commSize));
   MPI_CHECK(MPI_Comm_rank(MPI_COMM_WORLD, &commRank));
   if(commSize != MPI_NODES) mpi_abort(MPI_NODES_ABORT); // check mpiexec node count
-  std::cout << "<MAIN " << commRank << "/" << commSize << "> hostname: " << host_name << std::endl;
+  fs.open("cell"+std::to_string(commRank+1)+".log", std::fstream::out | std::fstream::trunc);
+  fs << "<MAIN " << commRank << "/" << commSize << "> hostname: " << host_name << std::endl;
 
   // read in the mesh file and display some mesh information
-  std::cout << "<MAIN " << commRank << "/" << commSize << "> creating mesh object..." << std::endl;
-  mesh_00 = new cCellMesh(commRank);
+  fs << "<MAIN " << commRank << "/" << commSize << "> creating mesh object..." << std::endl;
+  mesh_00 = new cCellMesh(commRank, &fs);
   mesh_00->print_info();
 
   // setup and run a model
   //  - reads in a model parameter file
-  std::cout << "<MAIN " << commRank << "/" << commSize << "> creating model object..." << std::endl;
-  //model = new cGeneric3dModel(mesh_00, commRank);
-  //model->run();
+  fs << "<MAIN " << commRank << "/" << commSize << "> creating model object..." << std::endl;
+  model = new cGeneric3dModel(mesh_00, &fs);
+  model->run();
 
   // save the results
-  //model->save_results();
+  model->save_results();
   gettimeofday(&end, NULL);
   duration = end.tv_sec - start.tv_sec;
-  std::cout << "<MAIN " << commRank << "/" << commSize << "> execution time: " << duration << " sec" << std::endl;
+  fs << "<MAIN " << commRank << "/" << commSize << "> execution time: " << duration << " sec" << std::endl;
 
-  //delete model;
+  delete model;
   delete mesh_00;
 
   // shutdown mpi
+  fs.close();
   MPI_CHECK(MPI_Finalize());
   return 0;
 }

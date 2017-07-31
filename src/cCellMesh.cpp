@@ -1,8 +1,7 @@
 /*
  * cCellMesh.cpp
  *
- *  Created on: 14/04/2015
- *      Author: jrugis
+ * Author: jrugis
  */
 
 #include <string>
@@ -17,13 +16,15 @@
 
 #include "cCellMesh.h"
 
-cCellMesh::cCellMesh(int commRank){
+cCellMesh::cCellMesh(int commRank, std::fstream *fstr){
   // initialise member variables
+  rank = commRank;
+  fs = fstr;
   nodes_count = 0;
   total_elements_count = 0;
   surface_elements_count = volume_elements_count = 0;
 
-  std::string file_name = "cs" + std::to_string(commRank) + ".msh"; 
+  std::string file_name = "cs" + std::to_string(rank+1) + ".msh"; 
   get_mesh(file_name);
   calc_dist();
 }
@@ -32,7 +33,7 @@ cCellMesh::~cCellMesh(){
 }
 
 void cCellMesh::calc_dist(){
-  std::cout << "<MESH> calculating node distance to surface..." << std::endl;
+  *fs << "<MESH> calculating node distance to surface..." << std::endl;
   Eigen::Matrix<tCoord,1,3> v1, v2;
   for(tElement n = 0; n < nodes_count; n++){
     if(surface_node(n)){
@@ -64,7 +65,7 @@ void cCellMesh::get_mesh(std::string file_name){
   }
 
   // get the mesh nodes
-  std::cout << "<MESH> getting the mesh nodes..." << std::endl;
+  *fs << "<MESH> getting the mesh nodes..." << std::endl;
   while(getline(cell_file, line)){
     if(line != "$Nodes") continue;
     getline(cell_file, line);
@@ -81,7 +82,7 @@ void cCellMesh::get_mesh(std::string file_name){
   surface_node.setZero();
 
   // get the mesh elements
-  std::cout << "<MESH> getting the mesh elements..." << std::endl;
+  *fs << "<MESH> getting the mesh elements..." << std::endl;
   while(getline(cell_file, line)){
     if(line != "$Elements") continue;
     getline(cell_file, line);
@@ -111,7 +112,7 @@ void cCellMesh::get_mesh(std::string file_name){
     break;
   }
   // get the node data
-  std::cout << "<MESH> getting the mesh node data..." << std::endl;
+  *fs << "<MESH> getting the mesh node data..." << std::endl;
   while(getline(cell_file, line)){
     if(line != "\"distance to nearest lumen\"") continue;
     else for(int i = 0; i < 6; i++) getline(cell_file, line); // skip six lines
@@ -127,8 +128,8 @@ void cCellMesh::get_mesh(std::string file_name){
 }
 
 void cCellMesh::print_info(){
-  std::cout << "<MESH> nodes_count: " << nodes_count << std::endl;
-  std::cout << "<MESH> total_elements_count: " << total_elements_count << std::endl;
-  std::cout << "<MESH> surface_elements_count: " << surface_elements_count << std::endl;
-  std::cout << "<MESH> volume_elements_count: " << volume_elements_count << std::endl;
+  *fs << "<MESH> nodes_count: " << nodes_count << std::endl;
+  *fs << "<MESH> total_elements_count: " << total_elements_count << std::endl;
+  *fs << "<MESH> surface_elements_count: " << surface_elements_count << std::endl;
+  *fs << "<MESH> volume_elements_count: " << volume_elements_count << std::endl;
 }
