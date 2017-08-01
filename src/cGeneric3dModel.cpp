@@ -521,16 +521,16 @@ void cGeneric3dModel::save_results(){
     
   // reduce first or output full results
   if (p[reduce]) {
-    save_matrix_reduce("cR"+std::to_string(mesh->rank)+".bin", MatrixXXC(u.block(0, 0, np, numt)));     // calcium
-    save_matrix_reduce("ip3R"+std::to_string(mesh->rank)+".bin", MatrixXXC(u.block(np, 0, np, numt)));  // ip3
+    save_matrix_reduce("cR"+std::to_string(mesh->rank+1)+".bin", MatrixXXC(u.block(0, 0, np, numt)));     // calcium
+    save_matrix_reduce("ip3R"+std::to_string(mesh->rank+1)+".bin", MatrixXXC(u.block(np, 0, np, numt)));  // ip3
   }
   else {
-    save_matrix("c"+std::to_string(mesh->rank)+".bin", MatrixXXC(u.block(0, 0, np, numt)));     // calcium
-    save_matrix("ip3"+std::to_string(mesh->rank)+".bin", MatrixXXC(u.block(np, 0, np, numt)));  // ip3
+    save_matrix("c"+std::to_string(mesh->rank+1)+".bin", MatrixXXC(u.block(0, 0, np, numt)));     // calcium
+    save_matrix("ip3"+std::to_string(mesh->rank+1)+".bin", MatrixXXC(u.block(np, 0, np, numt)));  // ip3
   }
 
-  //save_matrix("d"+std::to_string(mesh->rank)+".bin", MatrixXXC(u.block(2 * np, 0, np, numt)));  // d
-  //save_matrix("ce"+std::to_string(mesh->rank)+".bin", MatrixXXC(u.block(3 * np, 0, np, numt)));  // ce
+  //save_matrix("d"+std::to_string(mesh->rank+1)+".bin", MatrixXXC(u.block(2 * np, 0, np, numt)));  // d
+  //save_matrix("ce"+std::to_string(mesh->rank+1)+".bin", MatrixXXC(u.block(3 * np, 0, np, numt)));  // ce
 }
 
 void cGeneric3dModel::fatal_error(std::string msg){

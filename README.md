@@ -28,7 +28,7 @@
    1. cd ../test
    2. cp ../../test/cell01m_HARMONIC_100p.msh cs1.msh
    3. cp ../../test/generic3d_03-cs.dat cs1.dat
-   4. ../generic3d_03
+   4. mpiexec -n 7 ../generic3d_03
 5. check the results
    1. python ../../test/cs_reduce_min-max.py (only if not already reduced)
    2. python ../../test/cs_results_r.py
