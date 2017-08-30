@@ -52,6 +52,20 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RELEASE")
 endif(NOT CMAKE_BUILD_TYPE)
 
+# find MPI
+find_package(MPI)
+if (MPI_CXX_FOUND)
+    message(STATUS "MPI compile flags: '${MPI_CXX_COMPILE_FLAGS}'")
+    message(STATUS "MPI include path: '${MPI_CXX_INCLUDE_PATH}'")
+    message(STATUS "MPI libraries: '${MPI_CXX_LIBRARIES}'")
+    message(STATUS "MPI link flags: '${MPI_CXX_LINK_FLAGS}'")
+    include_directories(SYSTEM ${MPI_CXX_INCLUDE_PATH})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
+else()
+    message(FATAL_ERROR "Could not find MPI CXX compiler")
+endif()
+
 # hint for Boost location on PAN
 if(NOT BOOST_ROOT)
     set(BOOST_ROOT "/share/easybuild/RHEL6.3/sandybridge/software/Boost/1.58.0-intel-2015a-Python-2.7.9")
@@ -92,10 +106,10 @@ endif(${BUILD_MKL})
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     # force precise floating point calculations
     add_definitions(-fp-model precise)
-    
+
     # add host optimisation to RELEASEHOST build
     set(CMAKE_CXX_FLAGS_RELEASEHOST "-O3 -xHost -DNDEBUG")
-    
+
     # set flags for custom release on pan (optimal on wm and avx)
     set(CMAKE_CXX_FLAGS_RELEASEPAN "-O3 -xSSE4.2 -axAVX -DNDEBUG")
 # modify flags on GNU compiler too
@@ -114,18 +128,18 @@ endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
 if (ENABLE_GPROF)
     # add -pg compiler option
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
-    
+
     # also try to find grof programs
     find_program(GPROF_PROGRAM NAMES gprof)
     if (NOT GPROF_PROGRAM)
         message(STATUS "Could not find gprof program")
     endif()
-    
+
     find_program(GPROF2DOT_PROGRAM NAMES gprof2dot.py gprof2dot)
     if (NOT GPROF2DOT_PROGRAM)
         message(STATUS "Could not find gprof2dot program")
     endif()
-    
+
     find_program(DOT_PROGRAM NAMES dot)
     if (NOT DOT_PROGRAM)
         message(STATUS "Could not find dot program")
