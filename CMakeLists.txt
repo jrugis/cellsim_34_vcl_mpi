@@ -2,7 +2,7 @@
 # CMakeLists.txt for cellsim_34_vcl
 #
 
-cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 project(cellsim CXX)
 
 # enable testing (disable with -DBUILD_TESTING=OFF)
@@ -24,7 +24,7 @@ option(TEST_PYTHON_REDUCE "Add tests for the python version of reduce" ON)
 option(ENABLE_GPROF "Build executable with gprof-type profiling enabled" OFF)
 
 # set CXX standard
-add_definitions("-std=c++11")
+set(CMAKE_CXX_STANDARD 11)
 
 # detect system for naming executable
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
