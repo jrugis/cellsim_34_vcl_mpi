@@ -157,7 +157,7 @@ endif()
 if (NOT SKIP_COMPARE)
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E chdir ${TEST_RUN_DIR}
-        ${PYTHON_EXECUTABLE} ${TEST_SRC_DIR}/cs_compare_peaks.py cR1.bin ${TEST_SRC_DIR}/generic3d-cR.bin
+        ${PYTHON_EXECUTABLE} ${TEST_SRC_DIR}/cs_compare_peaks.py cR1.bin ${TEST_SRC_DIR}/generic3d-cR1.bin
         RESULT_VARIABLE STATUS
     )
     if (STATUS)

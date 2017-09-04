@@ -10,6 +10,7 @@ cs.msh
 *.log
 generic3d*
 !test/generic3d-cR.bin
+!test/generic3d-cR1.bin
 !test/generic3d_03-cs.dat
 !test/generic3d_04-cs.dat
 __pycache__/
