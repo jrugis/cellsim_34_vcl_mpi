@@ -21,11 +21,15 @@ macro(add_cellsim_test TEST_NAME)
                 -DGPROF_PROGRAM=${GPROF_PROGRAM}
                 -DGPROF2DOT_PROGRAM=${GPROF2DOT_PROGRAM}
                 -DDOT_PROGRAM=${DOT_PROGRAM}
+                -DMPIEXEC=${MPIEXEC}
+                -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
+                -DMPIEXEC_PREFLAGS=${MPIEXEC_PREFLAGS}
+                -DMPIEXEC_POSTFLAGS=${MPIEXEC_POSTFLAGS}
                 -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake
         )
         set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 3000)
     endif ()
-    
+
     if (TEST_PYTHON_REDUCE)
         message(STATUS "Adding test: '${TEST_NAME}_pyreduce'")
         set(TEST_RUN_DIR ${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAME}_pyreduce)
@@ -44,6 +48,10 @@ macro(add_cellsim_test TEST_NAME)
                 -DGPROF_PROGRAM=${GPROF_PROGRAM}
                 -DGPROF2DOT_PROGRAM=${GPROF2DOT_PROGRAM}
                 -DDOT_PROGRAM=${DOT_PROGRAM}
+                -DMPIEXEC=${MPIEXEC}
+                -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
+                -DMPIEXEC_PREFLAGS=${MPIEXEC_PREFLAGS}
+                -DMPIEXEC_POSTFLAGS=${MPIEXEC_POSTFLAGS}
                 -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake
         )
         set_tests_properties(${TEST_NAME}_pyreduce PROPERTIES TIMEOUT 3000)

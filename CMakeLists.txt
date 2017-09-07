@@ -2,7 +2,7 @@
 # CMakeLists.txt for cellsim_34_vcl
 #
 
-cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 project(cellsim CXX)
 
 # enable testing (disable with -DBUILD_TESTING=OFF)
@@ -24,7 +24,7 @@ option(TEST_PYTHON_REDUCE "Add tests for the python version of reduce" ON)
 option(ENABLE_GPROF "Build executable with gprof-type profiling enabled" OFF)
 
 # set CXX standard
-add_definitions("-std=c++11")
+set(CMAKE_CXX_STANDARD 11)
 
 # detect system for naming executable
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -51,6 +51,20 @@ if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type detected, defaulting to RELEASE")
     set(CMAKE_BUILD_TYPE "RELEASE")
 endif(NOT CMAKE_BUILD_TYPE)
+
+# find MPI
+find_package(MPI)
+if (MPI_CXX_FOUND)
+    message(STATUS "MPI compile flags: '${MPI_CXX_COMPILE_FLAGS}'")
+    message(STATUS "MPI include path: '${MPI_CXX_INCLUDE_PATH}'")
+    message(STATUS "MPI libraries: '${MPI_CXX_LIBRARIES}'")
+    message(STATUS "MPI link flags: '${MPI_CXX_LINK_FLAGS}'")
+    include_directories(SYSTEM ${MPI_CXX_INCLUDE_PATH})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
+else()
+    message(FATAL_ERROR "Could not find MPI CXX compiler")
+endif()
 
 # hint for Boost location on PAN
 if(NOT BOOST_ROOT)
@@ -92,10 +106,10 @@ endif(${BUILD_MKL})
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     # force precise floating point calculations
     add_definitions(-fp-model precise)
-    
+
     # add host optimisation to RELEASEHOST build
     set(CMAKE_CXX_FLAGS_RELEASEHOST "-O3 -xHost -DNDEBUG")
-    
+
     # set flags for custom release on pan (optimal on wm and avx)
     set(CMAKE_CXX_FLAGS_RELEASEPAN "-O3 -xSSE4.2 -axAVX -DNDEBUG")
 # modify flags on GNU compiler too
@@ -114,18 +128,18 @@ endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
 if (ENABLE_GPROF)
     # add -pg compiler option
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
-    
+
     # also try to find grof programs
     find_program(GPROF_PROGRAM NAMES gprof)
     if (NOT GPROF_PROGRAM)
         message(STATUS "Could not find gprof program")
     endif()
-    
+
     find_program(GPROF2DOT_PROGRAM NAMES gprof2dot.py gprof2dot)
     if (NOT GPROF2DOT_PROGRAM)
         message(STATUS "Could not find gprof2dot program")
     endif()
-    
+
     find_program(DOT_PROGRAM NAMES dot)
     if (NOT DOT_PROGRAM)
         message(STATUS "Could not find dot program")
